@@ -2,152 +2,160 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔍 Nối ảnh với bóng - Bé thông minh</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔍 Nối ảnh với bóng</title>
     <style>
         * {
             box-sizing: border-box;
             user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
-            margin: 0;
-            min-height: 100vh;
             background: linear-gradient(145deg, #f7f0e6 0%, #e6dccf 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
-            padding: 16px;
+            padding: 8px;
+            height: 100vh;
+            max-height: 100vh;
         }
 
         .app-container {
-            max-width: 780px;
+            max-width: 700px;
             width: 100%;
+            height: 100%;
+            max-height: 700px; /* giới hạn trên màn hình lớn */
             background: #fefcf7;
-            border-radius: 72px 72px 48px 48px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
-            padding: 24px 24px 32px;
-            transition: 0.3s;
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+            padding: 16px 18px 20px;
             border: 4px solid #fff8ed;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
         }
 
+        /* header */
         h1 {
             text-align: center;
-            font-size: 2rem;
-            margin: 0 0 8px 0;
+            font-size: 1.6rem;
+            margin: 0 0 2px 0;
             color: #5d4037;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            letter-spacing: 1px;
+            gap: 6px;
+            flex-wrap: wrap;
             font-weight: 700;
             text-shadow: 2px 2px 0 #f0ddd0;
-            flex-wrap: wrap;
         }
 
         h1 small {
-            font-size: 1rem;
+            font-size: 0.75rem;
             background: #bcaaa4;
             color: white;
-            padding: 6px 18px;
+            padding: 4px 14px;
             border-radius: 40px;
             font-weight: 400;
             letter-spacing: 0.5px;
-            text-shadow: none;
-        }
-
-        .instruction {
-            text-align: center;
-            font-size: 1.15rem;
-            color: #6d4c41;
-            background: #efe3d8;
-            padding: 12px 18px;
-            border-radius: 60px;
-            margin: 10px 0 22px 0;
-            display: inline-block;
-            width: auto;
-            backdrop-filter: blur(2px);
-            border: 2px dashed #b8957a;
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
         }
 
         .instruction-wrap {
             text-align: center;
+            margin: 2px 0 10px 0;
         }
 
-        /* lưới chính */
+        .instruction {
+            font-size: 0.95rem;
+            color: #6d4c41;
+            background: #efe3d8;
+            padding: 6px 16px;
+            border-radius: 60px;
+            display: inline-block;
+            border: 2px dashed #b8957a;
+            font-weight: 500;
+        }
+
+        /* grid co giãn */
         .game-grid {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 30px 20px;
-            margin: 20px 0 10px;
+            gap: 8px 12px;
+            flex: 1 1 auto;
+            min-height: 0;
+            align-items: stretch;
         }
 
         .column {
-            flex: 1 1 180px;
-            min-width: 140px;
+            flex: 1 1 120px;
+            min-width: 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 25px;
+            gap: 10px;
         }
 
         .column-label {
-            font-size: 1.1rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: #4e342e;
-            background: #d7ccc8;
-            padding: 4px 20px;
-            border-radius: 30px;
-            letter-spacing: 1px;
-            border: 2px solid #bcaaa4;
             background: #efebe9;
+            padding: 2px 16px;
+            border-radius: 30px;
+            border: 2px solid #bcaaa4;
+            letter-spacing: 0.5px;
         }
 
         .card-list {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 12px;
             width: 100%;
             align-items: center;
+            flex: 1 1 auto;
+            justify-content: space-evenly;
         }
 
         .card-item {
-            width: 120px;
-            height: 120px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 130px;
             background: #ffffff;
-            border-radius: 40px 20px 40px 20px;
-            box-shadow: 0 8px 0 #b8957a, 0 12px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 28px 16px 28px 16px;
+            box-shadow: 0 6px 0 #b8957a, 0 8px 16px rgba(0, 0, 0, 0.12);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.2s;
+            transition: 0.15s;
             cursor: pointer;
             border: 4px solid #f5eee9;
-            position: relative;
-            padding: 6px;
+            padding: 4px;
+            flex-shrink: 0;
         }
 
-        .card-item img {
-            max-width: 80%;
-            max-height: 80%;
-            display: block;
-            object-fit: contain;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+        .card-item span {
+            font-size: 3.2rem;
+            line-height: 1;
         }
 
-        /* bóng: màu xám + mờ */
-        .shadow-card .card-item img {
-            filter: grayscale(1) brightness(0.5) drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-            opacity: 0.8;
+        .shadow-card span {
+            filter: grayscale(1) brightness(0.4) drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
+            opacity: 0.85;
         }
 
         .card-item.selected {
-            box-shadow: 0 0 0 6px #ffb74d, 0 8px 0 #b8957a;
+            box-shadow: 0 0 0 5px #ffb74d, 0 6px 0 #b8957a;
             transform: scale(1.02);
             border-color: #ffa726;
             background: #fff3e0;
@@ -155,88 +163,82 @@
 
         .card-item.matched {
             opacity: 0.5;
-            filter: grayscale(0.6);
-            box-shadow: 0 4px 0 #6d8f6d, 0 8px 12px rgba(0, 0, 0, 0.1);
+            filter: grayscale(0.5);
+            box-shadow: 0 3px 0 #6d8f6d, 0 6px 12px rgba(0, 0, 0, 0.08);
             border-color: #8bc34a;
             cursor: default;
             pointer-events: none;
-            transform: scale(0.96);
-            transition: 0.3s;
+            transform: scale(0.94);
         }
 
-        .card-item.matched img {
+        .card-item.matched span {
             filter: grayscale(0.3) brightness(0.9);
         }
 
         .card-item:active:not(.matched):not(.selected) {
-            transform: scale(0.94);
+            transform: scale(0.92);
         }
 
-        /* đường kẻ nối (ảo) */
+        /* thanh trạng thái + nút */
         .connector-status {
             display: flex;
             justify-content: center;
-            margin: 10px 0 5px;
-            gap: 20px;
+            align-items: center;
+            gap: 12px;
             flex-wrap: wrap;
+            margin: 6px 0 4px;
         }
 
         .status-badge {
             background: #d7ccc8;
-            padding: 6px 24px;
+            padding: 4px 18px;
             border-radius: 60px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #3e2723;
             font-weight: 600;
             border: 2px solid #bcaaa4;
         }
 
-        .reset-btn {
-            background: #a1887f;
-            border: none;
-            padding: 12px 32px;
-            border-radius: 60px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 6px 0 #5d4037;
-            transition: 0.1s ease;
-            cursor: pointer;
-            border: 2px solid #8d6e63;
-            letter-spacing: 1px;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .reset-btn:active {
-            transform: translateY(6px);
-            box-shadow: 0 0px 0 #5d4037;
-        }
-
-        .reset-btn:hover {
-            background: #8d6e63;
-        }
-
         .footer {
             display: flex;
             justify-content: center;
-            margin-top: 28px;
+            margin-top: 4px;
         }
 
-        /* thông báo */
+        .reset-btn {
+            background: #a1887f;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 0 #5d4037;
+            cursor: pointer;
+            border: 2px solid #8d6e63;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.05s linear;
+        }
+
+        .reset-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0px 0 #5d4037;
+        }
+
         .toast {
             background: #4caf50;
             color: white;
-            padding: 6px 22px;
+            padding: 4px 18px;
             border-radius: 60px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.85rem;
             visibility: hidden;
             opacity: 0;
-            transition: 0.25s;
+            transition: 0.2s;
             display: inline-block;
-            margin-top: 8px;
+            margin-top: 2px;
             border: 2px solid #388e3c;
         }
 
@@ -245,130 +247,233 @@
             opacity: 1;
         }
 
-        @media (max-width: 550px) {
-            .app-container { padding: 16px; }
-            .card-item { width: 100px; height: 100px; }
-            .column { flex: 1 1 130px; }
+        /* ===== ĐIỀU CHỈNH CHO MÀN HÌNH NHỎ ===== */
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 12px 12px 16px;
+                max-height: 98vh;
+                border-radius: 32px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            h1 small {
+                font-size: 0.65rem;
+                padding: 2px 10px;
+            }
+            .instruction {
+                font-size: 0.75rem;
+                padding: 4px 12px;
+            }
+            .column {
+                flex: 1 1 90px;
+                min-width: 70px;
+                gap: 6px;
+            }
+            .card-item {
+                max-width: 100px;
+                border-radius: 20px 12px 20px 12px;
+                border-width: 3px;
+                box-shadow: 0 4px 0 #b8957a, 0 6px 12px rgba(0,0,0,0.1);
+            }
+            .card-item span {
+                font-size: 2.6rem;
+            }
+            .card-list {
+                gap: 8px;
+            }
+            .column-label {
+                font-size: 0.7rem;
+                padding: 2px 10px;
+            }
+            .status-badge {
+                font-size: 0.7rem;
+                padding: 2px 12px;
+            }
+            .reset-btn {
+                font-size: 0.9rem;
+                padding: 8px 20px;
+                box-shadow: 0 4px 0 #5d4037;
+            }
+            .toast {
+                font-size: 0.7rem;
+                padding: 3px 14px;
+            }
         }
+
         @media (max-width: 420px) {
-            .card-item { width: 80px; height: 80px; }
-            .column { flex: 1 1 100px; }
-            h1 { font-size: 1.5rem; }
+            .app-container {
+                padding: 8px 8px 12px;
+                max-height: 100vh;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.1rem;
+            }
+            .instruction {
+                font-size: 0.65rem;
+                padding: 3px 10px;
+            }
+            .column {
+                flex: 1 1 70px;
+                min-width: 60px;
+                gap: 4px;
+            }
+            .card-item {
+                max-width: 80px;
+                border-radius: 16px 8px 16px 8px;
+                border-width: 2px;
+                box-shadow: 0 3px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08);
+            }
+            .card-item span {
+                font-size: 2rem;
+            }
+            .card-list {
+                gap: 6px;
+            }
+            .column-label {
+                font-size: 0.6rem;
+                padding: 1px 8px;
+            }
+            .status-badge {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+            }
+            .reset-btn {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+                box-shadow: 0 3px 0 #5d4037;
+            }
+            .toast {
+                font-size: 0.6rem;
+                padding: 2px 10px;
+            }
+            .connector-status {
+                gap: 6px;
+            }
+        }
+
+        /* cho màn hình rất nhỏ (chiều cao thấp) */
+        @media (max-height: 650px) {
+            .app-container {
+                padding: 8px 10px 10px;
+            }
+            h1 {
+                font-size: 1rem;
+                margin-bottom: 0;
+            }
+            .instruction {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+            }
+            .card-item {
+                max-width: 70px;
+            }
+            .card-item span {
+                font-size: 1.8rem;
+            }
+            .card-list {
+                gap: 4px;
+            }
+            .column {
+                gap: 4px;
+            }
+            .reset-btn {
+                font-size: 0.7rem;
+                padding: 5px 12px;
+            }
+            .status-badge {
+                font-size: 0.6rem;
+                padding: 1px 8px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="app-container">
     <h1>
-        🧩 TÌM BÓNG TƯƠNG ỨNG
+        🧩 TÌM BÓNG
         <small>nối ảnh & bóng</small>
     </h1>
     <div class="instruction-wrap">
-        <div class="instruction">👆 Nhấn vào ảnh → nhấn bóng tương ứng</div>
+        <div class="instruction">👆 chọn ảnh → chọn bóng</div>
     </div>
 
     <div class="game-grid" id="gameGrid">
-        <!-- Cột ảnh màu -->
         <div class="column">
             <div class="column-label">🖼️ Ảnh</div>
             <div class="card-list" id="imageColumn"></div>
         </div>
-
-        <!-- Cột bóng xám -->
         <div class="column">
             <div class="column-label">🌑 Bóng</div>
             <div class="card-list" id="shadowColumn"></div>
         </div>
     </div>
 
-    <!-- trạng thái + reset -->
     <div class="connector-status">
         <span class="status-badge" id="pairsStatus">0 / 4 cặp</span>
-        <span class="status-badge" id="feedbackMessage">💡 chọn ảnh trước</span>
+        <span class="status-badge" id="feedbackMessage">💡 chọn ảnh</span>
     </div>
     <div class="footer">
         <button class="reset-btn" id="resetGameBtn">🔄 Chơi lại</button>
     </div>
-    <div style="text-align:center; margin-top: 12px;">
-        <span class="toast" id="winToast">🎉 Chúc mừng! Bạn đã nối đúng tất cả!</span>
+    <div style="text-align:center; margin-top: 2px;">
+        <span class="toast" id="winToast">🎉 Hoàn thành!</span>
     </div>
 </div>
 
 <script>
     (function() {
-        // Dữ liệu: 4 cặp ảnh – bóng (dùng emoji + tên để minh họa)
-        // Ứng với mỗi item: { id, name, image, shadow }
         const PAIRS = [
             { id: 0, name: 'Chó', image: '🐶', shadow: '🐕' },
             { id: 1, name: 'Mèo', image: '🐱', shadow: '🐈' },
-            { id: 2, name: 'Voi', image: '🐘', shadow: '🐘' },  // voi & bóng voi (cùng emoji nhưng xám)
-            { id: 3, name: 'Gấu', image: '🐻', shadow: '🐻' }    // gấu & bóng gấu
+            { id: 2, name: 'Voi', image: '🐘', shadow: '🐘' },
+            { id: 3, name: 'Gấu', image: '🐻', shadow: '🐻' }
         ];
 
-        // Trạng thái
-        let selectedImageId = null;          // id của ảnh đang chọn (hoặc null)
-        let matchedPairs = new Array(PAIRS.length).fill(false); // true nếu đã nối đúng
+        let selectedImageId = null;
+        let matchedPairs = new Array(PAIRS.length).fill(false);
         let pairCount = PAIRS.length;
         let matchedCount = 0;
 
-        // DOM elements
         const imageColumn = document.getElementById('imageColumn');
         const shadowColumn = document.getElementById('shadowColumn');
         const pairsStatus = document.getElementById('pairsStatus');
         const feedbackMsg = document.getElementById('feedbackMessage');
         const winToast = document.getElementById('winToast');
 
-        // Render lại toàn bộ dựa trên matchedPairs và selectedImageId
         function render() {
-            // Xóa nội dung cũ
             imageColumn.innerHTML = '';
             shadowColumn.innerHTML = '';
 
-            // Tạo thẻ ảnh (cột trái)
             PAIRS.forEach((pair, index) => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'card-item';
-                if (matchedPairs[index]) {
-                    cardDiv.classList.add('matched');
-                }
-                // lưu data-id
-                cardDiv.dataset.id = index;
-                cardDiv.dataset.type = 'image';
-
+                // Ảnh
+                const imgCard = document.createElement('div');
+                imgCard.className = 'card-item';
+                if (matchedPairs[index]) imgCard.classList.add('matched');
+                imgCard.dataset.id = index;
+                imgCard.dataset.type = 'image';
                 const imgSpan = document.createElement('span');
-                imgSpan.style.fontSize = '4rem';
-                imgSpan.style.lineHeight = '1';
                 imgSpan.textContent = pair.image;
-                cardDiv.appendChild(imgSpan);
+                imgCard.appendChild(imgSpan);
+                imgCard.addEventListener('click', onImageClick);
+                imageColumn.appendChild(imgCard);
 
-                // Sự kiện click
-                cardDiv.addEventListener('click', onImageClick);
-                imageColumn.appendChild(cardDiv);
+                // Bóng
+                const shCard = document.createElement('div');
+                shCard.className = 'card-item shadow-card';
+                if (matchedPairs[index]) shCard.classList.add('matched');
+                shCard.dataset.id = index;
+                shCard.dataset.type = 'shadow';
+                const shSpan = document.createElement('span');
+                shSpan.textContent = pair.shadow;
+                shCard.appendChild(shSpan);
+                shCard.addEventListener('click', onShadowClick);
+                shadowColumn.appendChild(shCard);
             });
 
-            // Tạo thẻ bóng (cột phải)
-            PAIRS.forEach((pair, index) => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'card-item shadow-card';
-                if (matchedPairs[index]) {
-                    cardDiv.classList.add('matched');
-                }
-                cardDiv.dataset.id = index;
-                cardDiv.dataset.type = 'shadow';
-
-                const shadowSpan = document.createElement('span');
-                shadowSpan.style.fontSize = '4rem';
-                shadowSpan.style.lineHeight = '1';
-                shadowSpan.textContent = pair.shadow;
-                cardDiv.appendChild(shadowSpan);
-
-                cardDiv.addEventListener('click', onShadowClick);
-                shadowColumn.appendChild(cardDiv);
-            });
-
-            // Cập nhật trạng thái đã chọn (highlight)
+            // highlight
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
-                // tìm card ảnh tương ứng và thêm class selected
                 const imageCards = imageColumn.querySelectorAll('.card-item');
                 imageCards.forEach(card => {
                     if (parseInt(card.dataset.id) === selectedImageId) {
@@ -377,123 +482,85 @@
                 });
             }
 
-            // Cập nhật số cặp
-            matchedCount = matchedPairs.filter(v => v === true).length;
+            matchedCount = matchedPairs.filter(v => v).length;
             pairsStatus.textContent = `${matchedCount} / ${pairCount} cặp`;
 
-            // Thông báo hướng dẫn
             if (matchedCount === pairCount) {
-                feedbackMsg.textContent = '🎉 Tuyệt vời! Bạn đã nối đúng tất cả!';
+                feedbackMsg.textContent = '🎉 Tuyệt vời!';
                 winToast.classList.add('show');
             } else {
                 winToast.classList.remove('show');
                 if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
-                    feedbackMsg.textContent = `🔍 Đang chọn: ${PAIRS[selectedImageId].name} → hãy nhấn bóng đúng`;
+                    feedbackMsg.textContent = `🔍 Đang chọn: ${PAIRS[selectedImageId].name}`;
                 } else {
-                    feedbackMsg.textContent = '💡 Nhấn vào một ảnh để bắt đầu';
+                    feedbackMsg.textContent = '💡 Nhấn vào ảnh';
                 }
             }
         }
 
-        // Xử lý click vào ảnh (cột trái)
         function onImageClick(e) {
             const card = e.currentTarget;
             const id = parseInt(card.dataset.id);
-            // Nếu đã match rồi thì không làm gì
             if (matchedPairs[id]) {
-                feedbackMsg.textContent = `⛔ ${PAIRS[id].name} đã được nối rồi!`;
+                feedbackMsg.textContent = `⛔ ${PAIRS[id].name} đã nối`;
                 return;
             }
-
-            // Nếu đang chọn ảnh khác, bỏ chọn cũ
-            if (selectedImageId !== null) {
-                // Nếu click vào ảnh đang được chọn -> bỏ chọn (toggle)
-                if (selectedImageId === id) {
-                    selectedImageId = null;
-                    feedbackMsg.textContent = '💡 Đã bỏ chọn';
-                    render();
-                    return;
-                }
-                // Nếu click vào ảnh khác => chuyển sang ảnh mới
-                // nhưng nếu ảnh cũ chưa match thì bỏ highlight
-                selectedImageId = id;
-                feedbackMsg.textContent = `🔍 Đang chọn: ${PAIRS[id].name} → hãy nhấn bóng đúng`;
+            if (selectedImageId === id) {
+                selectedImageId = null;
+                feedbackMsg.textContent = '💡 Đã bỏ chọn';
                 render();
                 return;
             }
-
-            // Chưa có ảnh nào được chọn
             selectedImageId = id;
-            feedbackMsg.textContent = `🔍 Đang chọn: ${PAIRS[id].name} → hãy nhấn bóng đúng`;
+            feedbackMsg.textContent = `🔍 Đang chọn: ${PAIRS[id].name}`;
             render();
         }
 
-        // Xử lý click vào bóng (cột phải)
         function onShadowClick(e) {
             const card = e.currentTarget;
             const shadowId = parseInt(card.dataset.id);
-
-            // Nếu bóng này đã match thì ignore
             if (matchedPairs[shadowId]) {
-                feedbackMsg.textContent = `⛔ Bóng của ${PAIRS[shadowId].name} đã được nối!`;
+                feedbackMsg.textContent = `⛔ Bóng đã nối`;
                 return;
             }
-
-            // Nếu chưa chọn ảnh nào
             if (selectedImageId === null) {
-                feedbackMsg.textContent = '👆 Hãy chọn một ảnh trước nhé!';
+                feedbackMsg.textContent = '👆 Chọn ảnh trước';
                 return;
             }
-
-            // Nếu ảnh đang chọn đã match (trường hợp bất thường)
             if (matchedPairs[selectedImageId]) {
-                // clear selection và render lại
                 selectedImageId = null;
-                feedbackMsg.textContent = '⚠️ Ảnh này đã được nối, hãy chọn ảnh khác';
+                feedbackMsg.textContent = '⚠️ Ảnh đã nối, chọn ảnh khác';
                 render();
                 return;
             }
 
-            // Kiểm tra: selectedImageId có khớp với shadowId không?
             if (selectedImageId === shadowId) {
-                // Nối đúng!
                 matchedPairs[selectedImageId] = true;
-                selectedImageId = null;  // reset selection
-                feedbackMsg.textContent = '✅ Nối thành công!';
+                selectedImageId = null;
+                feedbackMsg.textContent = '✅ Nối đúng!';
                 render();
-                // kiểm tra chiến thắng
-                if (matchedPairs.every(v => v === true)) {
-                    feedbackMsg.textContent = '🎉 Chúc mừng! Bạn đã hoàn thành!';
+                if (matchedPairs.every(v => v)) {
+                    feedbackMsg.textContent = '🎉 Chúc mừng!';
                 }
             } else {
-                // Nối sai
-                feedbackMsg.textContent = `❌ Sai rồi! ${PAIRS[selectedImageId].name} không khớp với bóng này. Thử lại!`;
-                // Không reset selection, nhưng có thể giữ lại highlight
-                // tuy nhiên vẫn giữ selectedImageId để dễ thử
-                // render lại để giữ highlight
+                feedbackMsg.textContent = `❌ Sai! ${PAIRS[selectedImageId].name} không khớp`;
                 render();
-                // thêm hiệu ứng lắc nhẹ (không cần thiết nhưng có thể)
                 card.style.transform = 'scale(0.9)';
-                setTimeout(() => { card.style.transform = ''; }, 200);
+                setTimeout(() => { card.style.transform = ''; }, 180);
             }
         }
 
-        // Reset game
         function resetGame() {
             selectedImageId = null;
             matchedPairs = new Array(PAIRS.length).fill(false);
-            matchedCount = 0;
             winToast.classList.remove('show');
-            feedbackMsg.textContent = '🔄 Đã làm mới! Chọn ảnh để bắt đầu.';
+            feedbackMsg.textContent = '🔄 Đã làm mới';
             render();
         }
 
-        // Sự kiện reset
         document.getElementById('resetGameBtn').addEventListener('click', resetGame);
-
-        // Khởi tạo lần đầu
         render();
-        feedbackMsg.textContent = '💡 Nhấn vào một ảnh để bắt đầu';
+        feedbackMsg.textContent = '💡 Nhấn vào ảnh để bắt đầu';
     })();
 </script>
 </body>
