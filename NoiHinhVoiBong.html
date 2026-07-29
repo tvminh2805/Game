@@ -177,6 +177,18 @@
             transform: scale(0.92);
         }
 
+        /* hiệu ứng rung khi sai */
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
         .connector-status {
             display: flex;
             justify-content: center;
@@ -389,10 +401,10 @@
 <div class="app-container">
     <h1>
         🧩 TÌM BÓNG
-        <small>Nối ảnh & bóng</small>
+        <small>nối ảnh & bóng</small>
     </h1>
     <div class="instruction-wrap">
-        <div class="instruction">👆 Chọn ảnh → Chọn bóng</div>
+        <div class="instruction">👆 chọn ảnh → chọn bóng</div>
     </div>
 
     <div class="game-grid">
@@ -420,34 +432,53 @@
 
 <script>
     (function() {
-        // === ÂM THANH ===
+        // === ÂM THANH với sự khác biệt rõ ràng ===
+        let audioCtx = null;
+
+        function ensureAudioContext() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    // fallback: không làm gì
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
+            return audioCtx;
+        }
+
         function playSound(type) {
+            const ctx = ensureAudioContext();
+            if (!ctx) return;
+
             try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
                 oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
+                gainNode.connect(ctx.destination);
 
                 if (type === 'correct') {
-                    // Tiếng "ding" vui: hai nốt lên
-                    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    oscillator.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
-                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                    oscillator.start(audioCtx.currentTime);
-                    oscillator.stop(audioCtx.currentTime + 0.2);
+                    // Âm thanh vui – hai nốt cao
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(1047, ctx.currentTime);  // C6
+                    oscillator.frequency.setValueAtTime(1319, ctx.currentTime + 0.1); // E6
+                    gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    oscillator.start(ctx.currentTime);
+                    oscillator.stop(ctx.currentTime + 0.25);
                 } else if (type === 'wrong') {
-                    // Tiếng "buzz" trầm
+                    // Âm thanh trầm “buz”
                     oscillator.type = 'sawtooth';
-                    oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
-                    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-                    oscillator.start(audioCtx.currentTime);
-                    oscillator.stop(audioCtx.currentTime + 0.25);
+                    oscillator.frequency.setValueAtTime(180, ctx.currentTime);
+                    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    oscillator.start(ctx.currentTime);
+                    oscillator.stop(ctx.currentTime + 0.3);
                 }
             } catch (e) {
-                // Bỏ qua lỗi nếu trình duyệt không hỗ trợ AudioContext
+                // bỏ qua nếu không phát được
             }
         }
 
@@ -566,18 +597,19 @@
                 matchedPairs[selectedImageId] = true;
                 selectedImageId = null;
                 feedbackMsg.textContent = '✅ Nối đúng!';
-                playSound('correct');  // 👈 âm thanh đúng
+                playSound('correct');   // tiếng vui
                 render();
                 if (matchedPairs.every(v => v)) {
                     feedbackMsg.textContent = '🎉 Chúc mừng!';
                 }
             } else {
-                // Sai
+                // Sai: phát âm thanh sai + hiệu ứng rung
                 feedbackMsg.textContent = `❌ Sai! ${PAIRS[selectedImageId].name} không khớp`;
-                playSound('wrong');    // 👈 âm thanh sai
+                playSound('wrong');     // tiếng báo sai
                 render();
-                card.style.transform = 'scale(0.9)';
-                setTimeout(() => { card.style.transform = ''; }, 180);
+                // Thêm hiệu ứng rung cho thẻ bóng
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 300);
             }
         }
 
@@ -592,6 +624,14 @@
         document.getElementById('resetGameBtn').addEventListener('click', resetGame);
         render();
         feedbackMsg.textContent = '💡 Nhấn vào ảnh để bắt đầu';
+
+        // Kích hoạt audio context khi chạm vào màn hình (cần thiết cho iOS)
+        document.addEventListener('touchstart', () => {
+            ensureAudioContext();
+        }, { once: true });
+        document.addEventListener('click', () => {
+            ensureAudioContext();
+        }, { once: true });
     })();
 </script>
 </body>
