@@ -142,7 +142,6 @@
             flex-shrink: 0;
         }
 
-        /* Nội dung bên trong card */
         .card-content {
             display: flex;
             flex-direction: column;
@@ -167,14 +166,13 @@
             margin-top: 1px;
         }
 
-        /* Bóng: chỉ hiển thị emoji, ẩn tên */
         .shadow-card .animal-name {
             display: none;
         }
         .shadow-card .emoji {
             filter: grayscale(1) brightness(0.4) drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
             opacity: 0.85;
-            font-size: 3rem; /* bóng to hơn một chút cho cân đối */
+            font-size: 3rem;
         }
 
         .card-item.selected {
@@ -202,7 +200,6 @@
             transform: scale(0.92);
         }
 
-        /* hiệu ứng rung khi sai */
         .shake {
             animation: shake 0.3s ease-in-out;
         }
@@ -475,16 +472,14 @@
 
 <script>
     (function() {
-        // === ÂM THANH ===
+        // === ÂM THANH (hiệu ứng) ===
         let audioCtx = null;
 
         function ensureAudioContext() {
             if (!audioCtx) {
                 try {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch (e) {
-                    // fallback
-                }
+                } catch (e) {}
             }
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume().catch(() => {});
@@ -495,13 +490,11 @@
         function playSound(type) {
             const ctx = ensureAudioContext();
             if (!ctx) return;
-
             try {
                 const oscillator = ctx.createOscillator();
                 const gainNode = ctx.createGain();
                 oscillator.connect(gainNode);
                 gainNode.connect(ctx.destination);
-
                 if (type === 'correct') {
                     oscillator.type = 'sine';
                     oscillator.frequency.setValueAtTime(1047, ctx.currentTime);
@@ -518,8 +511,23 @@
                     oscillator.start(ctx.currentTime);
                     oscillator.stop(ctx.currentTime + 0.3);
                 }
-            } catch (e) {
-                // bỏ qua
+            } catch (e) {}
+        }
+
+        // === ĐỌC TÊN BẰNG GIỌNG NÓI ===
+        function speakName(name) {
+            if ('speechSynthesis' in window) {
+                // Hủy giọng đang nói để không chồng âm
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(name);
+                utterance.lang = 'vi-VN';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                // Chọn giọng nữ tiếng Việt nếu có
+                const voices = window.speechSynthesis.getVoices();
+                const vietnameseVoice = voices.find(v => v.lang.startsWith('vi'));
+                if (vietnameseVoice) utterance.voice = vietnameseVoice;
+                window.speechSynthesis.speak(utterance);
             }
         }
 
@@ -580,7 +588,7 @@
                 shadowColumn.appendChild(shCard);
             });
 
-            // highlight ảnh đang chọn
+            // highlight
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
                 const imageCards = imageColumn.querySelectorAll('.card-item');
                 imageCards.forEach(card => {
@@ -609,8 +617,13 @@
         function onImageClick(e) {
             const card = e.currentTarget;
             const id = parseInt(card.dataset.id);
+            const pair = PAIRS[id];
+
+            // === ĐỌC TÊN CON VẬT ===
+            speakName(pair.name);
+
             if (matchedPairs[id]) {
-                feedbackMsg.textContent = `⛔ ${PAIRS[id].name} đã nối`;
+                feedbackMsg.textContent = `⛔ ${pair.name} đã nối`;
                 return;
             }
             if (selectedImageId === id) {
@@ -620,7 +633,7 @@
                 return;
             }
             selectedImageId = id;
-            feedbackMsg.textContent = `🔍 Đang chọn: ${PAIRS[id].name}`;
+            feedbackMsg.textContent = `🔍 Đang chọn: ${pair.name}`;
             render();
         }
 
@@ -643,7 +656,6 @@
             }
 
             if (selectedImageId === shadowId) {
-                // Đúng
                 matchedPairs[selectedImageId] = true;
                 selectedImageId = null;
                 feedbackMsg.textContent = '✅ Nối đúng!';
@@ -653,7 +665,6 @@
                     feedbackMsg.textContent = '🎉 Chúc mừng!';
                 }
             } else {
-                // Sai
                 feedbackMsg.textContent = `❌ Sai! ${PAIRS[selectedImageId].name} không khớp`;
                 playSound('wrong');
                 render();
@@ -671,6 +682,15 @@
         }
 
         document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+
+        // Khởi tạo giọng nói (cần tải danh sách giọng)
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices(); // kích hoạt tải danh sách
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
         render();
         feedbackMsg.textContent = '💡 Nhấn vào ảnh để bắt đầu';
 
