@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🔍 Nối ảnh với bóng</title>
+    <title>🔍 Nối ảnh với bóng - Nhiều trang</title>
     <style>
+        /* --- GIỮ NGUYÊN CSS NHƯ BẢN TRƯỚC --- */
         * {
             box-sizing: border-box;
             user-select: none;
             margin: 0;
             padding: 0;
         }
-
         html, body {
             height: 100%;
             overflow: hidden;
         }
-
         body {
             background: linear-gradient(145deg, #f7f0e6 0%, #e6dccf 100%);
             display: flex;
@@ -27,7 +26,6 @@
             height: 100vh;
             max-height: 100vh;
         }
-
         .app-container {
             max-width: 700px;
             width: 100%;
@@ -43,7 +41,6 @@
             justify-content: space-between;
             transition: all 0.2s;
         }
-
         h1 {
             text-align: center;
             font-size: 1.6rem;
@@ -57,7 +54,6 @@
             font-weight: 700;
             text-shadow: 2px 2px 0 #f0ddd0;
         }
-
         h1 small {
             font-size: 0.75rem;
             background: #bcaaa4;
@@ -67,12 +63,10 @@
             font-weight: 400;
             letter-spacing: 0.5px;
         }
-
         .instruction-wrap {
             text-align: center;
             margin: 2px 0 10px 0;
         }
-
         .instruction {
             font-size: 0.95rem;
             color: #6d4c41;
@@ -83,7 +77,6 @@
             border: 2px dashed #b8957a;
             font-weight: 500;
         }
-
         .game-grid {
             display: flex;
             flex-direction: row;
@@ -94,7 +87,6 @@
             min-height: 0;
             align-items: stretch;
         }
-
         .column {
             flex: 1 1 120px;
             min-width: 100px;
@@ -103,7 +95,6 @@
             align-items: center;
             gap: 10px;
         }
-
         .column-label {
             font-size: 0.85rem;
             font-weight: 600;
@@ -114,7 +105,6 @@
             border: 2px solid #bcaaa4;
             letter-spacing: 0.5px;
         }
-
         .card-list {
             display: flex;
             flex-direction: column;
@@ -124,7 +114,6 @@
             flex: 1 1 auto;
             justify-content: space-evenly;
         }
-
         .card-item {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -141,7 +130,6 @@
             padding: 4px;
             flex-shrink: 0;
         }
-
         .card-content {
             display: flex;
             flex-direction: column;
@@ -151,12 +139,10 @@
             height: 100%;
             gap: 2px;
         }
-
         .emoji {
             font-size: 2.8rem;
             line-height: 1.2;
         }
-
         .animal-name {
             font-size: 0.75rem;
             font-weight: 600;
@@ -165,7 +151,6 @@
             line-height: 1.2;
             margin-top: 1px;
         }
-
         .shadow-card .animal-name {
             display: none;
         }
@@ -174,14 +159,12 @@
             opacity: 0.85;
             font-size: 3rem;
         }
-
         .card-item.selected {
             box-shadow: 0 0 0 5px #ffb74d, 0 6px 0 #b8957a;
             transform: scale(1.02);
             border-color: #ffa726;
             background: #fff3e0;
         }
-
         .card-item.matched {
             opacity: 0.5;
             filter: grayscale(0.5);
@@ -191,15 +174,12 @@
             pointer-events: none;
             transform: scale(0.94);
         }
-
         .card-item.matched .emoji {
             filter: grayscale(0.3) brightness(0.9);
         }
-
         .card-item:active:not(.matched):not(.selected) {
             transform: scale(0.92);
         }
-
         .shake {
             animation: shake 0.3s ease-in-out;
         }
@@ -210,7 +190,6 @@
             60% { transform: translateX(-5px); }
             80% { transform: translateX(5px); }
         }
-
         .connector-status {
             display: flex;
             justify-content: center;
@@ -219,7 +198,6 @@
             flex-wrap: wrap;
             margin: 6px 0 4px;
         }
-
         .status-badge {
             background: #d7ccc8;
             padding: 4px 18px;
@@ -229,13 +207,39 @@
             font-weight: 600;
             border: 2px solid #bcaaa4;
         }
-
         .footer {
             display: flex;
             justify-content: center;
+            gap: 10px;
             margin-top: 4px;
+            flex-wrap: wrap;
         }
-
+        .nav-btn {
+            background: #a1887f;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 0 #5d4037;
+            cursor: pointer;
+            border: 2px solid #8d6e63;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.05s linear;
+        }
+        .nav-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0px 0 #5d4037;
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #5d4037;
+            pointer-events: none;
+        }
         .reset-btn {
             background: #a1887f;
             border: none;
@@ -252,12 +256,10 @@
             gap: 10px;
             transition: 0.05s linear;
         }
-
         .reset-btn:active {
             transform: translateY(5px);
             box-shadow: 0 0px 0 #5d4037;
         }
-
         .toast {
             background: #4caf50;
             color: white;
@@ -272,168 +274,64 @@
             margin-top: 2px;
             border: 2px solid #388e3c;
         }
-
         .toast.show {
             visibility: visible;
             opacity: 1;
         }
-
-        /* ===== RESPONSIVE ===== */
+        .page-indicator {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4e342e;
+            background: #efebe9;
+            padding: 4px 16px;
+            border-radius: 30px;
+            border: 2px solid #bcaaa4;
+        }
+        /* Responsive - giữ nguyên như bản cũ */
         @media (max-width: 600px) {
-            .app-container {
-                padding: 12px 12px 16px;
-                max-height: 98vh;
-                border-radius: 32px;
-            }
-            h1 {
-                font-size: 1.3rem;
-            }
-            h1 small {
-                font-size: 0.65rem;
-                padding: 2px 10px;
-            }
-            .instruction {
-                font-size: 0.75rem;
-                padding: 4px 12px;
-            }
-            .column {
-                flex: 1 1 90px;
-                min-width: 70px;
-                gap: 6px;
-            }
-            .card-item {
-                max-width: 100px;
-                border-radius: 20px 12px 20px 12px;
-                border-width: 3px;
-                box-shadow: 0 4px 0 #b8957a, 0 6px 12px rgba(0,0,0,0.1);
-            }
-            .emoji {
-                font-size: 2.2rem;
-            }
-            .shadow-card .emoji {
-                font-size: 2.4rem;
-            }
-            .animal-name {
-                font-size: 0.65rem;
-            }
-            .card-list {
-                gap: 8px;
-            }
-            .column-label {
-                font-size: 0.7rem;
-                padding: 2px 10px;
-            }
-            .status-badge {
-                font-size: 0.7rem;
-                padding: 2px 12px;
-            }
-            .reset-btn {
-                font-size: 0.9rem;
-                padding: 8px 20px;
-                box-shadow: 0 4px 0 #5d4037;
-            }
-            .toast {
-                font-size: 0.7rem;
-                padding: 3px 14px;
-            }
+            .app-container { padding: 12px 12px 16px; max-height: 98vh; border-radius: 32px; }
+            h1 { font-size: 1.3rem; }
+            h1 small { font-size: 0.65rem; padding: 2px 10px; }
+            .instruction { font-size: 0.75rem; padding: 4px 12px; }
+            .column { flex: 1 1 90px; min-width: 70px; gap: 6px; }
+            .card-item { max-width: 100px; border-radius: 20px 12px 20px 12px; border-width: 3px; box-shadow: 0 4px 0 #b8957a, 0 6px 12px rgba(0,0,0,0.1); }
+            .emoji { font-size: 2.2rem; }
+            .shadow-card .emoji { font-size: 2.4rem; }
+            .animal-name { font-size: 0.65rem; }
+            .card-list { gap: 8px; }
+            .column-label { font-size: 0.7rem; padding: 2px 10px; }
+            .status-badge { font-size: 0.7rem; padding: 2px 12px; }
+            .reset-btn, .nav-btn { font-size: 0.9rem; padding: 8px 18px; box-shadow: 0 4px 0 #5d4037; }
+            .toast { font-size: 0.7rem; padding: 3px 14px; }
         }
-
         @media (max-width: 420px) {
-            .app-container {
-                padding: 8px 8px 12px;
-                max-height: 100vh;
-                border-radius: 24px;
-            }
-            h1 {
-                font-size: 1.1rem;
-            }
-            .instruction {
-                font-size: 0.65rem;
-                padding: 3px 10px;
-            }
-            .column {
-                flex: 1 1 70px;
-                min-width: 60px;
-                gap: 4px;
-            }
-            .card-item {
-                max-width: 80px;
-                border-radius: 16px 8px 16px 8px;
-                border-width: 2px;
-                box-shadow: 0 3px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08);
-            }
-            .emoji {
-                font-size: 1.8rem;
-            }
-            .shadow-card .emoji {
-                font-size: 2rem;
-            }
-            .animal-name {
-                font-size: 0.55rem;
-            }
-            .card-list {
-                gap: 6px;
-            }
-            .column-label {
-                font-size: 0.6rem;
-                padding: 1px 8px;
-            }
-            .status-badge {
-                font-size: 0.6rem;
-                padding: 2px 8px;
-            }
-            .reset-btn {
-                font-size: 0.75rem;
-                padding: 6px 14px;
-                box-shadow: 0 3px 0 #5d4037;
-            }
-            .toast {
-                font-size: 0.6rem;
-                padding: 2px 10px;
-            }
-            .connector-status {
-                gap: 6px;
-            }
+            .app-container { padding: 8px 8px 12px; max-height: 100vh; border-radius: 24px; }
+            h1 { font-size: 1.1rem; }
+            .instruction { font-size: 0.65rem; padding: 3px 10px; }
+            .column { flex: 1 1 70px; min-width: 60px; gap: 4px; }
+            .card-item { max-width: 80px; border-radius: 16px 8px 16px 8px; border-width: 2px; box-shadow: 0 3px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08); }
+            .emoji { font-size: 1.8rem; }
+            .shadow-card .emoji { font-size: 2rem; }
+            .animal-name { font-size: 0.55rem; }
+            .card-list { gap: 6px; }
+            .column-label { font-size: 0.6rem; padding: 1px 8px; }
+            .status-badge { font-size: 0.6rem; padding: 2px 8px; }
+            .reset-btn, .nav-btn { font-size: 0.75rem; padding: 6px 12px; box-shadow: 0 3px 0 #5d4037; }
+            .toast { font-size: 0.6rem; padding: 2px 10px; }
+            .connector-status { gap: 6px; }
         }
-
         @media (max-height: 650px) {
-            .app-container {
-                padding: 8px 10px 10px;
-            }
-            h1 {
-                font-size: 1rem;
-                margin-bottom: 0;
-            }
-            .instruction {
-                font-size: 0.6rem;
-                padding: 2px 8px;
-            }
-            .card-item {
-                max-width: 70px;
-            }
-            .emoji {
-                font-size: 1.6rem;
-            }
-            .shadow-card .emoji {
-                font-size: 1.8rem;
-            }
-            .animal-name {
-                font-size: 0.5rem;
-            }
-            .card-list {
-                gap: 4px;
-            }
-            .column {
-                gap: 4px;
-            }
-            .reset-btn {
-                font-size: 0.7rem;
-                padding: 5px 12px;
-            }
-            .status-badge {
-                font-size: 0.6rem;
-                padding: 1px 8px;
-            }
+            .app-container { padding: 8px 10px 10px; }
+            h1 { font-size: 1rem; margin-bottom: 0; }
+            .instruction { font-size: 0.6rem; padding: 2px 8px; }
+            .card-item { max-width: 70px; }
+            .emoji { font-size: 1.6rem; }
+            .shadow-card .emoji { font-size: 1.8rem; }
+            .animal-name { font-size: 0.5rem; }
+            .card-list { gap: 4px; }
+            .column { gap: 4px; }
+            .reset-btn, .nav-btn { font-size: 0.7rem; padding: 5px 10px; }
+            .status-badge { font-size: 0.6rem; padding: 1px 8px; }
         }
     </style>
 </head>
@@ -461,12 +359,16 @@
     <div class="connector-status">
         <span class="status-badge" id="pairsStatus">0 / 4 cặp</span>
         <span class="status-badge" id="feedbackMessage">💡 chọn ảnh</span>
+        <span class="page-indicator" id="pageIndicator">Trang 1 / 2</span>
     </div>
+
     <div class="footer">
-        <button class="reset-btn" id="resetGameBtn">🔄 Chơi lại</button>
+        <button class="nav-btn" id="prevBtn">◀ Trước</button>
+        <button class="reset-btn" id="resetGameBtn">🔄 Làm mới</button>
+        <button class="nav-btn" id="nextBtn">Tiếp ▶</button>
     </div>
     <div style="text-align:center; margin-top: 2px;">
-        <span class="toast" id="winToast">🎉 Hoàn thành!</span>
+        <span class="toast" id="winToast">🎉 Hoàn thành trang!</span>
     </div>
 </div>
 
@@ -474,7 +376,6 @@
     (function() {
         // === ÂM THANH (hiệu ứng) ===
         let audioCtx = null;
-
         function ensureAudioContext() {
             if (!audioCtx) {
                 try {
@@ -486,7 +387,6 @@
             }
             return audioCtx;
         }
-
         function playSound(type) {
             const ctx = ensureAudioContext();
             if (!ctx) return;
@@ -517,13 +417,11 @@
         // === ĐỌC TÊN BẰNG GIỌNG NÓI ===
         function speakName(name) {
             if ('speechSynthesis' in window) {
-                // Hủy giọng đang nói để không chồng âm
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(name);
                 utterance.lang = 'vi-VN';
                 utterance.rate = 0.9;
                 utterance.pitch = 1.1;
-                // Chọn giọng nữ tiếng Việt nếu có
                 const voices = window.speechSynthesis.getVoices();
                 const vietnameseVoice = voices.find(v => v.lang.startsWith('vi'));
                 if (vietnameseVoice) utterance.voice = vietnameseVoice;
@@ -531,36 +429,54 @@
             }
         }
 
-        // === DỮ LIỆU ===
-        const PAIRS = [
-            { id: 0, name: 'Chó', image: '🐶', shadow: '🐕' },
-            { id: 1, name: 'Mèo', image: '🐱', shadow: '🐈' },
-            { id: 2, name: 'Voi', image: '🐘', shadow: '🐘' },
-            { id: 3, name: 'Gấu', image: '🐻', shadow: '🐻' }
+        // === DỮ LIỆU NHIỀU TRANG ===
+        const PAGES = [
+            // Trang 1 (4 con vật quen thuộc)
+            [
+                { id: 0, name: 'Chó', image: '🐶', shadow: '🐕' },
+                { id: 1, name: 'Mèo', image: '🐱', shadow: '🐈' },
+                { id: 2, name: 'Voi', image: '🐘', shadow: '🐘' },
+                { id: 3, name: 'Gấu', image: '🐻', shadow: '🐻' }
+            ],
+            // Trang 2 (4 con vật khác)
+            [
+                { id: 0, name: 'Hổ', image: '🐯', shadow: '🐅' },
+                { id: 1, name: 'Khỉ', image: '🐒', shadow: '🐒' },
+                { id: 2, name: 'Thỏ', image: '🐰', shadow: '🐇' },
+                { id: 3, name: 'Cáo', image: '🦊', shadow: '🦊' }
+            ]
+            // Bạn có thể thêm trang 3, 4...
         ];
 
+        let currentPage = 0;
+        let totalPages = PAGES.length;
+        let currentPairs = PAGES[currentPage];
         let selectedImageId = null;
-        let matchedPairs = new Array(PAIRS.length).fill(false);
-        let pairCount = PAIRS.length;
+        let matchedPairs = new Array(currentPairs.length).fill(false);
 
+        // DOM refs
         const imageColumn = document.getElementById('imageColumn');
         const shadowColumn = document.getElementById('shadowColumn');
         const pairsStatus = document.getElementById('pairsStatus');
         const feedbackMsg = document.getElementById('feedbackMessage');
         const winToast = document.getElementById('winToast');
+        const pageIndicator = document.getElementById('pageIndicator');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const resetBtn = document.getElementById('resetGameBtn');
 
+        // === HÀM RENDER ===
         function render() {
             imageColumn.innerHTML = '';
             shadowColumn.innerHTML = '';
 
-            PAIRS.forEach((pair, index) => {
-                // --- Ảnh (có tên) ---
+            currentPairs.forEach((pair, index) => {
+                // Ảnh
                 const imgCard = document.createElement('div');
                 imgCard.className = 'card-item';
                 if (matchedPairs[index]) imgCard.classList.add('matched');
                 imgCard.dataset.id = index;
                 imgCard.dataset.type = 'image';
-
                 const imgContent = document.createElement('div');
                 imgContent.className = 'card-content';
                 imgContent.innerHTML = `
@@ -571,24 +487,21 @@
                 imgCard.addEventListener('click', onImageClick);
                 imageColumn.appendChild(imgCard);
 
-                // --- Bóng (không tên) ---
+                // Bóng
                 const shCard = document.createElement('div');
                 shCard.className = 'card-item shadow-card';
                 if (matchedPairs[index]) shCard.classList.add('matched');
                 shCard.dataset.id = index;
                 shCard.dataset.type = 'shadow';
-
                 const shContent = document.createElement('div');
                 shContent.className = 'card-content';
-                shContent.innerHTML = `
-                    <span class="emoji">${pair.shadow}</span>
-                `;
+                shContent.innerHTML = `<span class="emoji">${pair.shadow}</span>`;
                 shCard.appendChild(shContent);
                 shCard.addEventListener('click', onShadowClick);
                 shadowColumn.appendChild(shCard);
             });
 
-            // highlight
+            // Highlight
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
                 const imageCards = imageColumn.querySelectorAll('.card-item');
                 imageCards.forEach(card => {
@@ -598,28 +511,47 @@
                 });
             }
 
+            // Cập nhật trạng thái
             const matchedCount = matchedPairs.filter(v => v).length;
-            pairsStatus.textContent = `${matchedCount} / ${pairCount} cặp`;
+            pairsStatus.textContent = `${matchedCount} / ${currentPairs.length} cặp`;
 
-            if (matchedCount === pairCount) {
-                feedbackMsg.textContent = '🎉 Tuyệt vời!';
+            // Kiểm tra hoàn thành trang
+            const isPageComplete = matchedCount === currentPairs.length;
+            if (isPageComplete) {
+                feedbackMsg.textContent = '🎉 Hoàn thành trang!';
                 winToast.classList.add('show');
+                // Hiển thị nút Next nếu còn trang tiếp theo
+                nextBtn.disabled = (currentPage >= totalPages - 1);
+                // Ẩn nút nếu là trang cuối
+                if (currentPage === totalPages - 1) {
+                    nextBtn.textContent = '🏁 Kết thúc';
+                    nextBtn.disabled = true;
+                } else {
+                    nextBtn.textContent = 'Tiếp ▶';
+                    nextBtn.disabled = false;
+                }
             } else {
                 winToast.classList.remove('show');
+                nextBtn.disabled = true; // không cho phép chuyển trang khi chưa hoàn thành
                 if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
-                    feedbackMsg.textContent = `🔍 Đang chọn: ${PAIRS[selectedImageId].name}`;
+                    feedbackMsg.textContent = `🔍 Đang chọn: ${currentPairs[selectedImageId].name}`;
                 } else {
                     feedbackMsg.textContent = '💡 Nhấn vào ảnh';
                 }
             }
+
+            // Cập nhật chỉ số trang và nút Previous
+            pageIndicator.textContent = `Trang ${currentPage + 1} / ${totalPages}`;
+            prevBtn.disabled = (currentPage === 0);
         }
 
+        // === SỰ KIỆN CLICK ẢNH ===
         function onImageClick(e) {
             const card = e.currentTarget;
             const id = parseInt(card.dataset.id);
-            const pair = PAIRS[id];
+            const pair = currentPairs[id];
 
-            // === ĐỌC TÊN CON VẬT ===
+            // Đọc tên
             speakName(pair.name);
 
             if (matchedPairs[id]) {
@@ -637,6 +569,7 @@
             render();
         }
 
+        // === SỰ KIỆN CLICK BÓNG ===
         function onShadowClick(e) {
             const card = e.currentTarget;
             const shadowId = parseInt(card.dataset.id);
@@ -661,11 +594,9 @@
                 feedbackMsg.textContent = '✅ Nối đúng!';
                 playSound('correct');
                 render();
-                if (matchedPairs.every(v => v)) {
-                    feedbackMsg.textContent = '🎉 Chúc mừng!';
-                }
+                // Nếu hoàn thành trang, render sẽ tự kích hoạt nút Next
             } else {
-                feedbackMsg.textContent = `❌ Sai! ${PAIRS[selectedImageId].name} không khớp`;
+                feedbackMsg.textContent = `❌ Sai! ${currentPairs[selectedImageId].name} không khớp`;
                 playSound('wrong');
                 render();
                 card.classList.add('shake');
@@ -673,19 +604,48 @@
             }
         }
 
-        function resetGame() {
+        // === CHUYỂN TRANG ===
+        function goToPage(page) {
+            if (page < 0 || page >= totalPages) return;
+            // Kiểm tra nếu trang hiện tại chưa hoàn thành thì không cho chuyển
+            const matchedCount = matchedPairs.filter(v => v).length;
+            if (page > currentPage && matchedCount < currentPairs.length) {
+                feedbackMsg.textContent = '⚠️ Hãy nối hết các cặp trước khi sang trang mới!';
+                return;
+            }
+            currentPage = page;
+            currentPairs = PAGES[currentPage];
+            matchedPairs = new Array(currentPairs.length).fill(false);
             selectedImageId = null;
-            matchedPairs = new Array(PAIRS.length).fill(false);
             winToast.classList.remove('show');
-            feedbackMsg.textContent = '🔄 Đã làm mới';
+            feedbackMsg.textContent = `📖 Trang ${currentPage + 1}`;
             render();
         }
 
-        document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+        // === SỰ KIỆN NÚT ===
+        prevBtn.addEventListener('click', () => {
+            goToPage(currentPage - 1);
+        });
 
-        // Khởi tạo giọng nói (cần tải danh sách giọng)
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages - 1) {
+                goToPage(currentPage + 1);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            // Reset lại trang hiện tại
+            matchedPairs = new Array(currentPairs.length).fill(false);
+            selectedImageId = null;
+            winToast.classList.remove('show');
+            feedbackMsg.textContent = '🔄 Đã làm mới trang';
+            render();
+        });
+
+        // === KHỞI TẠO ===
+        // Tải danh sách giọng nói
         if ('speechSynthesis' in window) {
-            window.speechSynthesis.getVoices(); // kích hoạt tải danh sách
+            window.speechSynthesis.getVoices();
             window.speechSynthesis.onvoiceschanged = () => {
                 window.speechSynthesis.getVoices();
             };
@@ -694,7 +654,7 @@
         render();
         feedbackMsg.textContent = '💡 Nhấn vào ảnh để bắt đầu';
 
-        // Kích hoạt audio context khi tương tác (iOS)
+        // Kích hoạt audio context khi tương tác
         document.addEventListener('touchstart', () => {
             ensureAudioContext();
         }, { once: true });
