@@ -142,14 +142,39 @@
             flex-shrink: 0;
         }
 
-        .card-item span {
-            font-size: 3.2rem;
-            line-height: 1;
+        /* Nội dung bên trong card */
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            gap: 2px;
         }
 
-        .shadow-card span {
+        .emoji {
+            font-size: 2.8rem;
+            line-height: 1.2;
+        }
+
+        .animal-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4e342e;
+            text-align: center;
+            line-height: 1.2;
+            margin-top: 1px;
+        }
+
+        /* Bóng: chỉ hiển thị emoji, ẩn tên */
+        .shadow-card .animal-name {
+            display: none;
+        }
+        .shadow-card .emoji {
             filter: grayscale(1) brightness(0.4) drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
             opacity: 0.85;
+            font-size: 3rem; /* bóng to hơn một chút cho cân đối */
         }
 
         .card-item.selected {
@@ -169,7 +194,7 @@
             transform: scale(0.94);
         }
 
-        .card-item.matched span {
+        .card-item.matched .emoji {
             filter: grayscale(0.3) brightness(0.9);
         }
 
@@ -285,8 +310,14 @@
                 border-width: 3px;
                 box-shadow: 0 4px 0 #b8957a, 0 6px 12px rgba(0,0,0,0.1);
             }
-            .card-item span {
-                font-size: 2.6rem;
+            .emoji {
+                font-size: 2.2rem;
+            }
+            .shadow-card .emoji {
+                font-size: 2.4rem;
+            }
+            .animal-name {
+                font-size: 0.65rem;
             }
             .card-list {
                 gap: 8px;
@@ -334,8 +365,14 @@
                 border-width: 2px;
                 box-shadow: 0 3px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08);
             }
-            .card-item span {
+            .emoji {
+                font-size: 1.8rem;
+            }
+            .shadow-card .emoji {
                 font-size: 2rem;
+            }
+            .animal-name {
+                font-size: 0.55rem;
             }
             .card-list {
                 gap: 6px;
@@ -377,8 +414,14 @@
             .card-item {
                 max-width: 70px;
             }
-            .card-item span {
+            .emoji {
+                font-size: 1.6rem;
+            }
+            .shadow-card .emoji {
                 font-size: 1.8rem;
+            }
+            .animal-name {
+                font-size: 0.5rem;
             }
             .card-list {
                 gap: 4px;
@@ -432,7 +475,7 @@
 
 <script>
     (function() {
-        // === ÂM THANH với sự khác biệt rõ ràng ===
+        // === ÂM THANH ===
         let audioCtx = null;
 
         function ensureAudioContext() {
@@ -440,7 +483,7 @@
                 try {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 } catch (e) {
-                    // fallback: không làm gì
+                    // fallback
                 }
             }
             if (audioCtx && audioCtx.state === 'suspended') {
@@ -460,16 +503,14 @@
                 gainNode.connect(ctx.destination);
 
                 if (type === 'correct') {
-                    // Âm thanh vui – hai nốt cao
                     oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(1047, ctx.currentTime);  // C6
-                    oscillator.frequency.setValueAtTime(1319, ctx.currentTime + 0.1); // E6
+                    oscillator.frequency.setValueAtTime(1047, ctx.currentTime);
+                    oscillator.frequency.setValueAtTime(1319, ctx.currentTime + 0.1);
                     gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
                     oscillator.start(ctx.currentTime);
                     oscillator.stop(ctx.currentTime + 0.25);
                 } else if (type === 'wrong') {
-                    // Âm thanh trầm “buz”
                     oscillator.type = 'sawtooth';
                     oscillator.frequency.setValueAtTime(180, ctx.currentTime);
                     gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
@@ -478,11 +519,11 @@
                     oscillator.stop(ctx.currentTime + 0.3);
                 }
             } catch (e) {
-                // bỏ qua nếu không phát được
+                // bỏ qua
             }
         }
 
-        // === LOGIC GAME ===
+        // === DỮ LIỆU ===
         const PAIRS = [
             { id: 0, name: 'Chó', image: '🐶', shadow: '🐕' },
             { id: 1, name: 'Mèo', image: '🐱', shadow: '🐈' },
@@ -505,32 +546,41 @@
             shadowColumn.innerHTML = '';
 
             PAIRS.forEach((pair, index) => {
-                // Ảnh
+                // --- Ảnh (có tên) ---
                 const imgCard = document.createElement('div');
                 imgCard.className = 'card-item';
                 if (matchedPairs[index]) imgCard.classList.add('matched');
                 imgCard.dataset.id = index;
                 imgCard.dataset.type = 'image';
-                const imgSpan = document.createElement('span');
-                imgSpan.textContent = pair.image;
-                imgCard.appendChild(imgSpan);
+
+                const imgContent = document.createElement('div');
+                imgContent.className = 'card-content';
+                imgContent.innerHTML = `
+                    <span class="emoji">${pair.image}</span>
+                    <span class="animal-name">${pair.name}</span>
+                `;
+                imgCard.appendChild(imgContent);
                 imgCard.addEventListener('click', onImageClick);
                 imageColumn.appendChild(imgCard);
 
-                // Bóng
+                // --- Bóng (không tên) ---
                 const shCard = document.createElement('div');
                 shCard.className = 'card-item shadow-card';
                 if (matchedPairs[index]) shCard.classList.add('matched');
                 shCard.dataset.id = index;
                 shCard.dataset.type = 'shadow';
-                const shSpan = document.createElement('span');
-                shSpan.textContent = pair.shadow;
-                shCard.appendChild(shSpan);
+
+                const shContent = document.createElement('div');
+                shContent.className = 'card-content';
+                shContent.innerHTML = `
+                    <span class="emoji">${pair.shadow}</span>
+                `;
+                shCard.appendChild(shContent);
                 shCard.addEventListener('click', onShadowClick);
                 shadowColumn.appendChild(shCard);
             });
 
-            // highlight
+            // highlight ảnh đang chọn
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
                 const imageCards = imageColumn.querySelectorAll('.card-item');
                 imageCards.forEach(card => {
@@ -597,17 +647,16 @@
                 matchedPairs[selectedImageId] = true;
                 selectedImageId = null;
                 feedbackMsg.textContent = '✅ Nối đúng!';
-                playSound('correct');   // tiếng vui
+                playSound('correct');
                 render();
                 if (matchedPairs.every(v => v)) {
                     feedbackMsg.textContent = '🎉 Chúc mừng!';
                 }
             } else {
-                // Sai: phát âm thanh sai + hiệu ứng rung
+                // Sai
                 feedbackMsg.textContent = `❌ Sai! ${PAIRS[selectedImageId].name} không khớp`;
-                playSound('wrong');     // tiếng báo sai
+                playSound('wrong');
                 render();
-                // Thêm hiệu ứng rung cho thẻ bóng
                 card.classList.add('shake');
                 setTimeout(() => card.classList.remove('shake'), 300);
             }
@@ -625,7 +674,7 @@
         render();
         feedbackMsg.textContent = '💡 Nhấn vào ảnh để bắt đầu';
 
-        // Kích hoạt audio context khi chạm vào màn hình (cần thiết cho iOS)
+        // Kích hoạt audio context khi tương tác (iOS)
         document.addEventListener('touchstart', () => {
             ensureAudioContext();
         }, { once: true });
