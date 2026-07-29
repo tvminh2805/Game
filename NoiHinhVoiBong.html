@@ -2,29 +2,20 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🔍 Tìm bóng - Khắc phục zoom Chrome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔍 Tìm bóng - Nút hiển thị đầy đủ</title>
     <style>
-        /* ===== RESET ===== */
         * {
             box-sizing: border-box;
             user-select: none;
             margin: 0;
             padding: 0;
-            touch-action: manipulation;
-        }
-
-        html {
-            /* Ngăn Chrome tự động zoom */
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
         }
 
         html, body {
             height: 100%;
             overflow: hidden;
-            margin: 0;
-            padding: 0;
+            touch-action: manipulation;
         }
 
         body {
@@ -36,16 +27,13 @@
             padding: 4px;
             height: 100vh;
             max-height: 100vh;
-            /* Chặn zoom */
-            zoom: 1;
-            transform: scale(1);
         }
 
         .app-container {
             max-width: 600px;
             width: 100%;
             height: 100%;
-            max-height: 92vh;
+            max-height: 620px;
             background: #fefcf7;
             border-radius: 32px 32px 20px 20px;
             box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
@@ -55,15 +43,12 @@
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
-            /* Chặn zoom */
-            zoom: 1;
-            transform: scale(1);
         }
 
         /* === HEADER === */
         h1 {
             text-align: center;
-            font-size: clamp(1rem, 4vw, 1.4rem);
+            font-size: 1.2rem;
             margin: 0 0 1px 0;
             color: #5d4037;
             display: flex;
@@ -75,7 +60,7 @@
             text-shadow: 2px 2px 0 #f0ddd0;
         }
         h1 small {
-            font-size: clamp(0.5rem, 1.8vw, 0.65rem);
+            font-size: 0.55rem;
             background: #bcaaa4;
             color: white;
             padding: 2px 10px;
@@ -89,7 +74,7 @@
             margin: 0px 0 4px 0;
         }
         .instruction {
-            font-size: clamp(0.55rem, 2vw, 0.75rem);
+            font-size: 0.7rem;
             color: #6d4c41;
             background: #efe3d8;
             padding: 2px 12px;
@@ -112,8 +97,8 @@
         }
 
         .column {
-            flex: 1 1 110px;
-            min-width: 70px;
+            flex: 1 1 100px;
+            min-width: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -121,7 +106,7 @@
         }
 
         .column-label {
-            font-size: clamp(0.5rem, 1.8vw, 0.7rem);
+            font-size: 0.65rem;
             font-weight: 600;
             color: #4e342e;
             background: #efebe9;
@@ -145,7 +130,7 @@
         .card-item {
             width: 100%;
             aspect-ratio: 1 / 1;
-            max-width: 110px;
+            max-width: 100px;
             background: #ffffff;
             border-radius: 18px 10px 18px 10px;
             box-shadow: 0 3px 0 #b8957a, 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -177,7 +162,7 @@
         }
 
         .animal-name {
-            font-size: clamp(0.45rem, 1.6vw, 0.65rem);
+            font-size: 0.6rem;
             font-weight: 700;
             color: #4e342e;
             text-align: center;
@@ -185,6 +170,7 @@
             margin-top: 0px;
         }
 
+        /* Bóng */
         .shadow-card .card-image {
             filter: grayscale(1) brightness(0.45) drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
             opacity: 0.85;
@@ -193,6 +179,7 @@
             display: none;
         }
 
+        /* Trạng thái */
         .card-item.selected {
             box-shadow: 0 0 0 4px #ffb74d, 0 3px 0 #b8957a;
             transform: scale(1.03);
@@ -241,7 +228,7 @@
             background: #d7ccc8;
             padding: 1px 8px;
             border-radius: 60px;
-            font-size: clamp(0.45rem, 1.5vw, 0.6rem);
+            font-size: 0.55rem;
             color: #3e2723;
             font-weight: 600;
             border: 2px solid #bcaaa4;
@@ -249,7 +236,7 @@
         }
 
         .page-indicator {
-            font-size: clamp(0.45rem, 1.5vw, 0.65rem);
+            font-size: 0.6rem;
             font-weight: 600;
             color: #4e342e;
             background: #efebe9;
@@ -259,7 +246,7 @@
             white-space: nowrap;
         }
 
-        /* === FOOTER - LUÔN HIỂN THỊ === */
+        /* === FOOTER - QUAN TRỌNG: LUÔN HIỂN THỊ === */
         .footer {
             display: flex;
             justify-content: center;
@@ -275,7 +262,7 @@
             border: none;
             padding: 5px 12px;
             border-radius: 60px;
-            font-size: clamp(0.5rem, 1.8vw, 0.75rem);
+            font-size: 0.7rem;
             font-weight: bold;
             color: white;
             box-shadow: 0 2px 0 #5d4037;
@@ -285,7 +272,7 @@
             align-items: center;
             gap: 3px;
             transition: 0.05s linear;
-            min-width: 44px;
+            min-width: 48px;
             justify-content: center;
             flex-shrink: 0;
         }
@@ -306,7 +293,7 @@
             padding: 1px 12px;
             border-radius: 60px;
             font-weight: 600;
-            font-size: clamp(0.4rem, 1.5vw, 0.65rem);
+            font-size: 0.6rem;
             visibility: hidden;
             opacity: 0;
             transition: 0.2s;
@@ -319,15 +306,31 @@
             opacity: 1;
         }
 
-        /* ===== RESPONSIVE - TỐI ƯU CHO MỌI MÀN HÌNH ===== */
+        /* === RESPONSIVE - TỐI ƯU CHO MỌI MÀN HÌNH === */
         @media (max-width: 450px) {
             .app-container {
                 padding: 6px 6px 8px;
-                max-height: 96vh;
+                max-height: 98vh;
                 border-radius: 24px;
             }
+            h1 {
+                font-size: 1rem;
+            }
+            h1 small {
+                font-size: 0.5rem;
+                padding: 1px 8px;
+            }
+            .instruction {
+                font-size: 0.6rem;
+                padding: 1px 8px;
+            }
+            .column {
+                flex: 1 1 80px;
+                min-width: 65px;
+                gap: 2px;
+            }
             .card-item {
-                max-width: 85px;
+                max-width: 80px;
                 border-radius: 14px 8px 14px 8px;
                 border-width: 2px;
                 box-shadow: 0 2px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08);
@@ -337,22 +340,68 @@
                 width: 75%;
                 height: 70%;
             }
+            .animal-name {
+                font-size: 0.5rem;
+            }
             .card-list {
                 gap: 4px;
             }
-            .column {
-                flex: 1 1 80px;
-                min-width: 60px;
-                gap: 2px;
+            .column-label {
+                font-size: 0.55rem;
+                padding: 1px 8px;
+            }
+            .status-badge {
+                font-size: 0.5rem;
+                padding: 1px 6px;
+            }
+            .page-indicator {
+                font-size: 0.5rem;
+                padding: 1px 8px;
+            }
+            .nav-btn, .reset-btn {
+                font-size: 0.6rem;
+                padding: 4px 8px;
+                min-width: 40px;
+                box-shadow: 0 2px 0 #5d4037;
+                border-width: 1.5px;
+            }
+            .toast {
+                font-size: 0.5rem;
+                padding: 1px 8px;
+            }
+            .connector-status {
+                gap: 3px;
+                margin: 1px 0 1px;
+            }
+            .footer {
+                gap: 3px;
+                margin-top: 1px;
+                padding: 1px 0;
             }
         }
 
         @media (max-width: 360px) {
             .app-container {
                 padding: 4px 4px 6px;
-                max-height: 98vh;
+                max-height: 100vh;
                 border-radius: 18px;
                 border-width: 2px;
+            }
+            h1 {
+                font-size: 0.85rem;
+            }
+            h1 small {
+                font-size: 0.45rem;
+                padding: 1px 6px;
+            }
+            .instruction {
+                font-size: 0.5rem;
+                padding: 1px 6px;
+            }
+            .column {
+                flex: 1 1 65px;
+                min-width: 55px;
+                gap: 2px;
             }
             .card-item {
                 max-width: 65px;
@@ -365,24 +414,59 @@
                 width: 72%;
                 height: 68%;
             }
-            .column {
-                flex: 1 1 60px;
-                min-width: 50px;
-                gap: 2px;
+            .animal-name {
+                font-size: 0.45rem;
+            }
+            .card-list {
+                gap: 3px;
+            }
+            .column-label {
+                font-size: 0.5rem;
+                padding: 1px 6px;
+            }
+            .status-badge {
+                font-size: 0.4rem;
+                padding: 1px 5px;
+            }
+            .page-indicator {
+                font-size: 0.45rem;
+                padding: 1px 6px;
             }
             .nav-btn, .reset-btn {
-                font-size: clamp(0.4rem, 1.5vw, 0.55rem);
+                font-size: 0.5rem;
                 padding: 3px 6px;
                 min-width: 32px;
                 box-shadow: 0 1.5px 0 #5d4037;
                 border-width: 1.5px;
+            }
+            .toast {
+                font-size: 0.45rem;
+                padding: 1px 6px;
+            }
+            .connector-status {
+                gap: 2px;
+                margin: 1px 0 1px;
+            }
+            .footer {
+                gap: 2px;
+                margin-top: 1px;
+                padding: 1px 0;
             }
         }
 
         @media (max-height: 560px) {
             .app-container {
                 padding: 4px 6px 6px;
-                max-height: 98vh;
+                max-height: 100vh;
+            }
+            h1 {
+                font-size: 0.8rem;
+                margin-bottom: 0;
+            }
+            .instruction {
+                font-size: 0.5rem;
+                padding: 1px 6px;
+                margin-bottom: 1px;
             }
             .card-item {
                 max-width: 60px;
@@ -395,6 +479,9 @@
                 width: 70%;
                 height: 65%;
             }
+            .animal-name {
+                font-size: 0.45rem;
+            }
             .card-list {
                 gap: 3px;
             }
@@ -402,10 +489,27 @@
                 gap: 2px;
             }
             .nav-btn, .reset-btn {
-                font-size: clamp(0.4rem, 1.5vw, 0.6rem);
+                font-size: 0.55rem;
                 padding: 3px 8px;
                 min-width: 35px;
                 box-shadow: 0 1.5px 0 #5d4037;
+            }
+            .status-badge {
+                font-size: 0.45rem;
+                padding: 1px 5px;
+            }
+            .page-indicator {
+                font-size: 0.45rem;
+                padding: 1px 6px;
+            }
+            .connector-status {
+                margin: 1px 0 1px;
+                gap: 2px;
+            }
+            .footer {
+                margin-top: 1px;
+                gap: 2px;
+                padding: 1px 0;
             }
         }
     </style>
