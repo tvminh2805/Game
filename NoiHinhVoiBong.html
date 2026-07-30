@@ -2,22 +2,27 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🔍 Tìm bóng - Nút hiển thị đầy đủ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🔍 Tìm bóng - Xáo trộn bóng</title>
     <style>
+        /* ===== CSS giữ nguyên như bản trước, chỉ bổ sung thêm style cho fallback emoji ===== */
         * {
             box-sizing: border-box;
             user-select: none;
             margin: 0;
             padding: 0;
+            touch-action: manipulation;
         }
-
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
         html, body {
             height: 100%;
             overflow: hidden;
-            touch-action: manipulation;
+            margin: 0;
+            padding: 0;
         }
-
         body {
             background: linear-gradient(145deg, #f7f0e6 0%, #e6dccf 100%);
             display: flex;
@@ -27,13 +32,14 @@
             padding: 4px;
             height: 100vh;
             max-height: 100vh;
+            zoom: 1;
+            transform: scale(1);
         }
-
         .app-container {
             max-width: 600px;
             width: 100%;
             height: 100%;
-            max-height: 620px;
+            max-height: 92vh;
             background: #fefcf7;
             border-radius: 32px 32px 20px 20px;
             box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
@@ -43,12 +49,12 @@
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
+            zoom: 1;
+            transform: scale(1);
         }
-
-        /* === HEADER === */
         h1 {
             text-align: center;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 4vw, 1.4rem);
             margin: 0 0 1px 0;
             color: #5d4037;
             display: flex;
@@ -60,21 +66,19 @@
             text-shadow: 2px 2px 0 #f0ddd0;
         }
         h1 small {
-            font-size: 0.55rem;
+            font-size: clamp(0.5rem, 1.8vw, 0.65rem);
             background: #bcaaa4;
             color: white;
             padding: 2px 10px;
             border-radius: 40px;
             font-weight: 400;
-            letter-spacing: 0.3px;
         }
-
         .instruction-wrap {
             text-align: center;
             margin: 0px 0 4px 0;
         }
         .instruction {
-            font-size: 0.7rem;
+            font-size: clamp(0.55rem, 2vw, 0.75rem);
             color: #6d4c41;
             background: #efe3d8;
             padding: 2px 12px;
@@ -83,8 +87,6 @@
             border: 2px dashed #b8957a;
             font-weight: 500;
         }
-
-        /* === GRID === */
         .game-grid {
             display: flex;
             flex-direction: row;
@@ -95,27 +97,23 @@
             min-height: 0;
             align-items: stretch;
         }
-
         .column {
-            flex: 1 1 100px;
-            min-width: 80px;
+            flex: 1 1 110px;
+            min-width: 70px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 3px;
         }
-
         .column-label {
-            font-size: 0.65rem;
+            font-size: clamp(0.5rem, 1.8vw, 0.7rem);
             font-weight: 600;
             color: #4e342e;
             background: #efebe9;
             padding: 1px 10px;
             border-radius: 30px;
             border: 2px solid #bcaaa4;
-            letter-spacing: 0.3px;
         }
-
         .card-list {
             display: flex;
             flex-direction: column;
@@ -125,12 +123,10 @@
             flex: 1 1 auto;
             justify-content: space-evenly;
         }
-
-        /* === CARD === */
         .card-item {
             width: 100%;
             aspect-ratio: 1 / 1;
-            max-width: 100px;
+            max-width: 110px;
             background: #ffffff;
             border-radius: 18px 10px 18px 10px;
             box-shadow: 0 3px 0 #b8957a, 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -143,7 +139,6 @@
             padding: 3px;
             flex-shrink: 0;
         }
-
         .card-content {
             display: flex;
             flex-direction: column;
@@ -153,24 +148,19 @@
             height: 100%;
             gap: 1px;
         }
-
         .card-image {
             width: 78%;
             height: 72%;
             object-fit: contain;
             display: block;
         }
-
         .animal-name {
-            font-size: 0.6rem;
+            font-size: clamp(0.45rem, 1.6vw, 0.65rem);
             font-weight: 700;
             color: #4e342e;
             text-align: center;
             line-height: 1.2;
-            margin-top: 0px;
         }
-
-        /* Bóng */
         .shadow-card .card-image {
             filter: grayscale(1) brightness(0.45) drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
             opacity: 0.85;
@@ -178,8 +168,6 @@
         .shadow-card .animal-name {
             display: none;
         }
-
-        /* Trạng thái */
         .card-item.selected {
             box-shadow: 0 0 0 4px #ffb74d, 0 3px 0 #b8957a;
             transform: scale(1.03);
@@ -201,7 +189,6 @@
         .card-item:active:not(.matched):not(.selected) {
             transform: scale(0.92);
         }
-
         .shake {
             animation: shake 0.3s ease-in-out;
         }
@@ -212,8 +199,6 @@
             60% { transform: translateX(-4px); }
             80% { transform: translateX(4px); }
         }
-
-        /* === STATUS BAR === */
         .connector-status {
             display: flex;
             justify-content: center;
@@ -223,20 +208,18 @@
             margin: 2px 0 2px;
             flex-shrink: 0;
         }
-
         .status-badge {
             background: #d7ccc8;
             padding: 1px 8px;
             border-radius: 60px;
-            font-size: 0.55rem;
+            font-size: clamp(0.45rem, 1.5vw, 0.6rem);
             color: #3e2723;
             font-weight: 600;
             border: 2px solid #bcaaa4;
             white-space: nowrap;
         }
-
         .page-indicator {
-            font-size: 0.6rem;
+            font-size: clamp(0.45rem, 1.5vw, 0.65rem);
             font-weight: 600;
             color: #4e342e;
             background: #efebe9;
@@ -245,8 +228,6 @@
             border: 2px solid #bcaaa4;
             white-space: nowrap;
         }
-
-        /* === FOOTER - QUAN TRỌNG: LUÔN HIỂN THỊ === */
         .footer {
             display: flex;
             justify-content: center;
@@ -256,13 +237,12 @@
             flex-shrink: 0;
             padding: 2px 0;
         }
-
         .nav-btn, .reset-btn {
             background: #a1887f;
             border: none;
             padding: 5px 12px;
             border-radius: 60px;
-            font-size: 0.7rem;
+            font-size: clamp(0.5rem, 1.8vw, 0.75rem);
             font-weight: bold;
             color: white;
             box-shadow: 0 2px 0 #5d4037;
@@ -272,7 +252,7 @@
             align-items: center;
             gap: 3px;
             transition: 0.05s linear;
-            min-width: 48px;
+            min-width: 44px;
             justify-content: center;
             flex-shrink: 0;
         }
@@ -286,14 +266,13 @@
             box-shadow: 0 1px 0 #5d4037;
             pointer-events: none;
         }
-
         .toast {
             background: #4caf50;
             color: white;
             padding: 1px 12px;
             border-radius: 60px;
             font-weight: 600;
-            font-size: 0.6rem;
+            font-size: clamp(0.4rem, 1.5vw, 0.65rem);
             visibility: hidden;
             opacity: 0;
             transition: 0.2s;
@@ -305,212 +284,33 @@
             visibility: visible;
             opacity: 1;
         }
-
-        /* === RESPONSIVE - TỐI ƯU CHO MỌI MÀN HÌNH === */
+        .fallback-emoji {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
         @media (max-width: 450px) {
-            .app-container {
-                padding: 6px 6px 8px;
-                max-height: 98vh;
-                border-radius: 24px;
-            }
-            h1 {
-                font-size: 1rem;
-            }
-            h1 small {
-                font-size: 0.5rem;
-                padding: 1px 8px;
-            }
-            .instruction {
-                font-size: 0.6rem;
-                padding: 1px 8px;
-            }
-            .column {
-                flex: 1 1 80px;
-                min-width: 65px;
-                gap: 2px;
-            }
-            .card-item {
-                max-width: 80px;
-                border-radius: 14px 8px 14px 8px;
-                border-width: 2px;
-                box-shadow: 0 2px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08);
-                padding: 2px;
-            }
-            .card-image {
-                width: 75%;
-                height: 70%;
-            }
-            .animal-name {
-                font-size: 0.5rem;
-            }
-            .card-list {
-                gap: 4px;
-            }
-            .column-label {
-                font-size: 0.55rem;
-                padding: 1px 8px;
-            }
-            .status-badge {
-                font-size: 0.5rem;
-                padding: 1px 6px;
-            }
-            .page-indicator {
-                font-size: 0.5rem;
-                padding: 1px 8px;
-            }
-            .nav-btn, .reset-btn {
-                font-size: 0.6rem;
-                padding: 4px 8px;
-                min-width: 40px;
-                box-shadow: 0 2px 0 #5d4037;
-                border-width: 1.5px;
-            }
-            .toast {
-                font-size: 0.5rem;
-                padding: 1px 8px;
-            }
-            .connector-status {
-                gap: 3px;
-                margin: 1px 0 1px;
-            }
-            .footer {
-                gap: 3px;
-                margin-top: 1px;
-                padding: 1px 0;
-            }
+            .app-container { padding: 6px 6px 8px; max-height: 96vh; border-radius: 24px; }
+            .card-item { max-width: 85px; border-radius: 14px 8px 14px 8px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08); padding: 2px; }
+            .card-image { width: 75%; height: 70%; }
+            .card-list { gap: 4px; }
+            .column { flex: 1 1 80px; min-width: 60px; gap: 2px; }
         }
-
         @media (max-width: 360px) {
-            .app-container {
-                padding: 4px 4px 6px;
-                max-height: 100vh;
-                border-radius: 18px;
-                border-width: 2px;
-            }
-            h1 {
-                font-size: 0.85rem;
-            }
-            h1 small {
-                font-size: 0.45rem;
-                padding: 1px 6px;
-            }
-            .instruction {
-                font-size: 0.5rem;
-                padding: 1px 6px;
-            }
-            .column {
-                flex: 1 1 65px;
-                min-width: 55px;
-                gap: 2px;
-            }
-            .card-item {
-                max-width: 65px;
-                border-radius: 10px 6px 10px 6px;
-                border-width: 2px;
-                box-shadow: 0 2px 0 #b8957a, 0 3px 6px rgba(0,0,0,0.08);
-                padding: 2px;
-            }
-            .card-image {
-                width: 72%;
-                height: 68%;
-            }
-            .animal-name {
-                font-size: 0.45rem;
-            }
-            .card-list {
-                gap: 3px;
-            }
-            .column-label {
-                font-size: 0.5rem;
-                padding: 1px 6px;
-            }
-            .status-badge {
-                font-size: 0.4rem;
-                padding: 1px 5px;
-            }
-            .page-indicator {
-                font-size: 0.45rem;
-                padding: 1px 6px;
-            }
-            .nav-btn, .reset-btn {
-                font-size: 0.5rem;
-                padding: 3px 6px;
-                min-width: 32px;
-                box-shadow: 0 1.5px 0 #5d4037;
-                border-width: 1.5px;
-            }
-            .toast {
-                font-size: 0.45rem;
-                padding: 1px 6px;
-            }
-            .connector-status {
-                gap: 2px;
-                margin: 1px 0 1px;
-            }
-            .footer {
-                gap: 2px;
-                margin-top: 1px;
-                padding: 1px 0;
-            }
+            .app-container { padding: 4px 4px 6px; max-height: 98vh; border-radius: 18px; border-width: 2px; }
+            .card-item { max-width: 65px; border-radius: 10px 6px 10px 6px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 3px 6px rgba(0,0,0,0.08); padding: 2px; }
+            .card-image { width: 72%; height: 68%; }
+            .column { flex: 1 1 60px; min-width: 50px; gap: 2px; }
+            .nav-btn, .reset-btn { font-size: clamp(0.4rem, 1.5vw, 0.55rem); padding: 3px 6px; min-width: 32px; box-shadow: 0 1.5px 0 #5d4037; border-width: 1.5px; }
+            .fallback-emoji { font-size: 1.8rem; }
         }
-
         @media (max-height: 560px) {
-            .app-container {
-                padding: 4px 6px 6px;
-                max-height: 100vh;
-            }
-            h1 {
-                font-size: 0.8rem;
-                margin-bottom: 0;
-            }
-            .instruction {
-                font-size: 0.5rem;
-                padding: 1px 6px;
-                margin-bottom: 1px;
-            }
-            .card-item {
-                max-width: 60px;
-                border-radius: 10px 6px 10px 6px;
-                border-width: 2px;
-                box-shadow: 0 2px 0 #b8957a, 0 3px 6px rgba(0,0,0,0.08);
-                padding: 2px;
-            }
-            .card-image {
-                width: 70%;
-                height: 65%;
-            }
-            .animal-name {
-                font-size: 0.45rem;
-            }
-            .card-list {
-                gap: 3px;
-            }
-            .column {
-                gap: 2px;
-            }
-            .nav-btn, .reset-btn {
-                font-size: 0.55rem;
-                padding: 3px 8px;
-                min-width: 35px;
-                box-shadow: 0 1.5px 0 #5d4037;
-            }
-            .status-badge {
-                font-size: 0.45rem;
-                padding: 1px 5px;
-            }
-            .page-indicator {
-                font-size: 0.45rem;
-                padding: 1px 6px;
-            }
-            .connector-status {
-                margin: 1px 0 1px;
-                gap: 2px;
-            }
-            .footer {
-                margin-top: 1px;
-                gap: 2px;
-                padding: 1px 0;
-            }
+            .app-container { padding: 4px 6px 6px; max-height: 98vh; }
+            .card-item { max-width: 60px; border-radius: 10px 6px 10px 6px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 3px 6px rgba(0,0,0,0.08); padding: 2px; }
+            .card-image { width: 70%; height: 65%; }
+            .card-list { gap: 3px; }
+            .column { gap: 2px; }
+            .nav-btn, .reset-btn { font-size: clamp(0.4rem, 1.5vw, 0.6rem); padding: 3px 8px; min-width: 35px; box-shadow: 0 1.5px 0 #5d4037; }
+            .fallback-emoji { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -608,28 +408,46 @@
             }
         }
 
-        // === DỮ LIỆU ===
+        // === HÀM XÁO TRỘN (SHUFFLE) ===
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function generateShuffledIndices(len) {
+            return shuffleArray([...Array(len).keys()]);
+        }
+
+        // === DỮ LIỆU NHIỀU TRANG ===
         const PAGES = [
+            // Trang 1
             [
-                { id: 0, name: 'Chó', imageUrl: 'https://lh3.googleusercontent.com/d/17kwKG45F3OuqDTH24PqCH4ux6aTTCJFv', shadowUrl: 'https://drive.usercontent.google.com/download?id=1xAFLoGndYZbhkrkZ5sXj99ZUt8XZp-jm&export=view&authuser=0' },
+                { id: 0, name: 'Chó', imageUrl: 'https://lh3.googleusercontent.com/d/17kwKG45F3OuqDTH24PqCH4ux6aTTCJFv', shadowUrl: 'https://lh3.googleusercontent.com/d/17kwKG45F3OuqDTH24PqCH4ux6aTTCJFv' },
                 { id: 1, name: 'Mèo', imageUrl: 'https://drive.usercontent.google.com/download?id=1xAFLoGndYZbhkrkZ5sXj99ZUt8XZp-jm&export=view&authuser=0', shadowUrl: 'https://lh3.googleusercontent.com/d/17kwKG45F3OuqDTH24PqCH4ux6aTTCJFv' },
                 { id: 2, name: 'Gà', imageUrl: 'https://drive.usercontent.google.com/download?id=1212Zx_tzjdDD-EH2SU8S6o9mFLlyGz58&export=view&authuser=0', shadowUrl: 'https://drive.usercontent.google.com/download?id=1XRd8NMpb4a4K1XomRSQ9RIcDTr1tt5c6' },
                 { id: 3, name: 'Vịt', imageUrl: 'https://drive.usercontent.google.com/download?id=1XRd8NMpb4a4K1XomRSQ9RIcDTr1tt5c6', shadowUrl: 'https://drive.usercontent.google.com/download?id=1212Zx_tzjdDD-EH2SU8S6o9mFLlyGz58&export=view&authuser=0' }
             ],
+            // Trang 2
             [
-                { id: 0, name: 'Hổ', imageUrl: 'https://media.giphy.com/media/l3V0x6h7yS5K2qM4Y/giphy.gif', shadowUrl: 'https://media.giphy.com/media/l3V0x6h7yS5K2qM4Y/giphy.gif' },
-                { id: 1, name: 'Khỉ', imageUrl: 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif', shadowUrl: 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif' },
-                { id: 2, name: 'Thỏ', imageUrl: 'https://media.giphy.com/media/3o6Zt5qMl7n0bJq1Xa/giphy.gif', shadowUrl: 'https://media.giphy.com/media/3o6Zt5qMl7n0bJq1Xa/giphy.gif' },
-                { id: 3, name: 'Cáo', imageUrl: 'https://media.giphy.com/media/l3V0x6h7yS5K2qM4Y/giphy.gif', shadowUrl: 'https://media.giphy.com/media/l3V0x6h7yS5K2qM4Y/giphy.gif' }
+                { id: 0, name: 'Hổ', imageUrl: '...', shadowUrl: '...' },
+                { id: 1, name: 'Khỉ', imageUrl: '...', shadowUrl: '...' },
+                { id: 2, name: 'Thỏ', imageUrl: '...', shadowUrl: '...' },
+                { id: 3, name: 'Cáo', imageUrl: '...', shadowUrl: '...' }
             ]
         ];
 
+        // === STATE ===
         let currentPage = 0;
         let totalPages = PAGES.length;
         let currentPairs = PAGES[currentPage];
-        let selectedImageId = null;
         let matchedPairs = new Array(currentPairs.length).fill(false);
+        let selectedImageId = null;
+        let currentShuffledIndices = generateShuffledIndices(currentPairs.length);  // thứ tự bóng hiện tại
 
+        // DOM
         const imageColumn = document.getElementById('imageColumn');
         const shadowColumn = document.getElementById('shadowColumn');
         const pairsStatus = document.getElementById('pairsStatus');
@@ -640,10 +458,21 @@
         const nextBtn = document.getElementById('nextBtn');
         const resetBtn = document.getElementById('resetGameBtn');
 
+        // === HÀM LẤY EMOJI DỰ PHÒNG ===
+        function getEmoji(name) {
+            const map = {
+                'Chó': '🐶', 'Mèo': '🐱', 'Voi': '🐘', 'Gấu': '🐻',
+                'Hổ': '🐯', 'Khỉ': '🐒', 'Thỏ': '🐰', 'Cáo': '🦊'
+            };
+            return map[name] || '🐾';
+        }
+
+        // === RENDER ===
         function render() {
             imageColumn.innerHTML = '';
             shadowColumn.innerHTML = '';
 
+            // Cột ảnh (giữ nguyên thứ tự)
             currentPairs.forEach((pair, index) => {
                 const imgCard = document.createElement('div');
                 imgCard.className = 'card-item';
@@ -653,28 +482,39 @@
                 const imgContent = document.createElement('div');
                 imgContent.className = 'card-content';
                 imgContent.innerHTML = `
-                    <img class="card-image" src="${pair.imageUrl}" alt="${pair.name}" loading="lazy">
+                    <img class="card-image" src="${pair.imageUrl}" alt="${pair.name}" 
+                         loading="lazy" 
+                         onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-emoji').style.display='block';">
+                    <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
                     <span class="animal-name">${pair.name}</span>
                 `;
                 imgCard.appendChild(imgContent);
                 imgCard.addEventListener('click', onImageClick);
                 imageColumn.appendChild(imgCard);
+            });
 
+            // Cột bóng (theo thứ tự đã xáo trộn)
+            currentShuffledIndices.forEach((originalIndex) => {
+                const pair = currentPairs[originalIndex];
                 const shCard = document.createElement('div');
                 shCard.className = 'card-item shadow-card';
-                if (matchedPairs[index]) shCard.classList.add('matched');
-                shCard.dataset.id = index;
+                if (matchedPairs[originalIndex]) shCard.classList.add('matched');
+                shCard.dataset.id = originalIndex;  // lưu id của cặp
                 shCard.dataset.type = 'shadow';
                 const shContent = document.createElement('div');
                 shContent.className = 'card-content';
                 shContent.innerHTML = `
-                    <img class="card-image" src="${pair.shadowUrl || pair.imageUrl}" alt="${pair.name} bóng" loading="lazy">
+                    <img class="card-image" src="${pair.shadowUrl || pair.imageUrl}" alt="${pair.name} bóng" 
+                         loading="lazy"
+                         onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-emoji').style.display='block';">
+                    <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
                 `;
                 shCard.appendChild(shContent);
                 shCard.addEventListener('click', onShadowClick);
                 shadowColumn.appendChild(shCard);
             });
 
+            // Highlight ảnh đang chọn
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
                 const imageCards = imageColumn.querySelectorAll('.card-item');
                 imageCards.forEach(card => {
@@ -684,6 +524,7 @@
                 });
             }
 
+            // Cập nhật trạng thái
             const matchedCount = matchedPairs.filter(v => v).length;
             pairsStatus.textContent = `${matchedCount} / ${currentPairs.length} cặp`;
 
@@ -713,6 +554,7 @@
             prevBtn.disabled = (currentPage === 0);
         }
 
+        // === SỰ KIỆN ===
         function onImageClick(e) {
             const card = e.currentTarget;
             const id = parseInt(card.dataset.id);
@@ -735,7 +577,7 @@
 
         function onShadowClick(e) {
             const card = e.currentTarget;
-            const shadowId = parseInt(card.dataset.id);
+            const shadowId = parseInt(card.dataset.id); // lấy id của cặp gốc
             if (matchedPairs[shadowId]) {
                 feedbackMsg.textContent = `⛔ Bóng đã nối`;
                 return;
@@ -751,12 +593,14 @@
                 return;
             }
             if (selectedImageId === shadowId) {
+                // Nối đúng
                 matchedPairs[selectedImageId] = true;
                 selectedImageId = null;
                 feedbackMsg.textContent = '✅ Nối đúng!';
                 playSound('correct');
                 render();
             } else {
+                // Sai
                 feedbackMsg.textContent = `❌ Sai! ${currentPairs[selectedImageId].name} không khớp`;
                 playSound('wrong');
                 render();
@@ -765,6 +609,7 @@
             }
         }
 
+        // === CHUYỂN TRANG ===
         function goToPage(page) {
             if (page < 0 || page >= totalPages) return;
             const matchedCount = matchedPairs.filter(v => v).length;
@@ -776,23 +621,32 @@
             currentPairs = PAGES[currentPage];
             matchedPairs = new Array(currentPairs.length).fill(false);
             selectedImageId = null;
+            // Tạo xáo trộn mới cho bóng
+            currentShuffledIndices = generateShuffledIndices(currentPairs.length);
             winToast.classList.remove('show');
             feedbackMsg.textContent = `📖 Trang ${currentPage + 1}`;
             render();
         }
 
+        // === RESET TRANG ===
+        function resetGame() {
+            matchedPairs = new Array(currentPairs.length).fill(false);
+            selectedImageId = null;
+            // Xáo trộn lại bóng
+            currentShuffledIndices = generateShuffledIndices(currentPairs.length);
+            winToast.classList.remove('show');
+            feedbackMsg.textContent = '🔄 Đã làm mới trang';
+            render();
+        }
+
+        // === GÁN SỰ KIỆN ===
         prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
         nextBtn.addEventListener('click', () => {
             if (currentPage < totalPages - 1) goToPage(currentPage + 1);
         });
-        resetBtn.addEventListener('click', () => {
-            matchedPairs = new Array(currentPairs.length).fill(false);
-            selectedImageId = null;
-            winToast.classList.remove('show');
-            feedbackMsg.textContent = '🔄 Đã làm mới trang';
-            render();
-        });
+        resetBtn.addEventListener('click', resetGame);
 
+        // === KHỞI TẠO ===
         if ('speechSynthesis' in window) {
             window.speechSynthesis.getVoices();
             window.speechSynthesis.onvoiceschanged = () => {
