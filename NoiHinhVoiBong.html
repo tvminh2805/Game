@@ -10,7 +10,7 @@
             user-select: none;
             margin: 0;
             padding: 0;
-            touch-action: none; /* Ngăn cuộn/zoom khi tương tác */
+            touch-action: none;
         }
         html {
             -webkit-text-size-adjust: 100%;
@@ -148,9 +148,10 @@
             gap: 1px;
             pointer-events: none;
         }
+        /* ===== ẢNH TO HƠN, SÁT KHUNG ===== */
         .card-image {
-            width: 78%;
-            height: 72%;
+            width: 92% !important;  /* tăng từ 78% lên 92% */
+            height: 88% !important; /* tăng từ 72% lên 88% */
             object-fit: contain;
             display: block;
             pointer-events: none;
@@ -162,6 +163,7 @@
             text-align: center;
             line-height: 1.2;
             pointer-events: none;
+            margin-top: 1px;
         }
         /* ===== BÓNG ĐEN TỪ ẢNH ===== */
         .shadow-card .card-image {
@@ -212,13 +214,13 @@
             align-items: center;
             justify-content: center;
             border: 3px solid #ffa726;
-            padding: 6px;
+            padding: 4px;
             transform: translate(-50%, -50%) scale(1.05);
             opacity: 0.95;
         }
         .drag-clone img {
-            width: 80%;
-            height: 80%;
+            width: 92% !important;
+            height: 88% !important;
             object-fit: contain;
             display: block;
         }
@@ -322,33 +324,37 @@
             line-height: 1;
             pointer-events: none;
         }
-        /* Responsive */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 450px) {
             .app-container { padding: 6px 6px 8px; max-height: 96vh; border-radius: 24px; }
             .card-item { max-width: 85px; border-radius: 14px 8px 14px 8px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08); padding: 2px; }
-            .card-image { width: 75%; height: 70%; }
+            .card-image { width: 90% !important; height: 85% !important; }
             .card-list { gap: 4px; }
             .column { flex: 1 1 80px; min-width: 60px; gap: 2px; }
             .drag-clone { width: 75px; height: 75px; }
+            .drag-clone img { width: 90% !important; height: 85% !important; }
+            .fallback-emoji { font-size: 2rem; }
         }
         @media (max-width: 360px) {
             .app-container { padding: 4px 4px 6px; max-height: 98vh; border-radius: 18px; border-width: 2px; }
             .card-item { max-width: 65px; border-radius: 10px 6px 10px 6px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 3px 6px rgba(0,0,0,0.08); padding: 2px; }
-            .card-image { width: 72%; height: 68%; }
+            .card-image { width: 88% !important; height: 82% !important; }
             .column { flex: 1 1 60px; min-width: 50px; gap: 2px; }
             .nav-btn, .reset-btn { font-size: clamp(0.4rem, 1.5vw, 0.55rem); padding: 3px 6px; min-width: 32px; box-shadow: 0 1.5px 0 #5d4037; border-width: 1.5px; }
             .drag-clone { width: 60px; height: 60px; }
-            .fallback-emoji { font-size: 1.8rem; }
+            .drag-clone img { width: 88% !important; height: 82% !important; }
+            .fallback-emoji { font-size: 1.6rem; }
         }
         @media (max-height: 560px) {
             .app-container { padding: 4px 6px 6px; max-height: 98vh; }
             .card-item { max-width: 60px; border-radius: 10px 6px 10px 6px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 3px 6px rgba(0,0,0,0.08); padding: 2px; }
-            .card-image { width: 70%; height: 65%; }
+            .card-image { width: 88% !important; height: 82% !important; }
             .card-list { gap: 3px; }
             .column { gap: 2px; }
             .nav-btn, .reset-btn { font-size: clamp(0.4rem, 1.5vw, 0.6rem); padding: 3px 8px; min-width: 35px; box-shadow: 0 1.5px 0 #5d4037; }
             .drag-clone { width: 55px; height: 55px; }
-            .fallback-emoji { font-size: 1.6rem; }
+            .drag-clone img { width: 88% !important; height: 82% !important; }
+            .fallback-emoji { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -356,10 +362,10 @@
 <div class="app-container">
     <h1>
         🧩 TÌM BÓNG CỦA ẢNH
-
+    
     </h1>
     <div class="instruction-wrap">
-        <div class="instruction">👆 Kéo ảnh thả vào bóng</div>
+        <div class="instruction">👆 Kéo ảnh thả vào bóng của nó</div>
     </div>
 
     <div class="game-grid">
@@ -375,7 +381,7 @@
 
     <div class="connector-status">
         <span class="status-badge" id="pairsStatus">0 / 4 cặp</span>
-        <span class="status-badge" id="feedbackMessage">💡 Kéo ảnh vào bóng</span>
+        <span class="status-badge" id="feedbackMessage">💡 Kéo ảnh vào bóng </span>
         <span class="page-indicator" id="pageIndicator">Trang 1 / 4</span>
     </div>
 
@@ -454,18 +460,18 @@
         return shuffleArray([...Array(len).keys()]);
     }
 
-    // === DỮ LIỆU (có thể thay ảnh của bạn) ===
+    // === DỮ LIỆU (thay ảnh của bạn) ===
     const PAGES = [
             [
                 { id: 0, name: 'Bọ rùa', imageUrl: 'https://lh3.googleusercontent.com/d/1TMIHujR8J2_MsmWbcNqGFVne1mc-lnA9 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1TMIHujR8J2_MsmWbcNqGFVne1mc-lnA9 ' },
                 { id: 1, name: 'Bướm', imageUrl: 'https://lh3.googleusercontent.com/d/1Du_-gAxGAPGe0PDTuaEVx-UKgSPZmAb7 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1Du_-gAxGAPGe0PDTuaEVx-UKgSPZmAb7 ' },
                 { id: 2, name: 'Châu chấu', imageUrl: 'https://lh3.googleusercontent.com/d/1Iumvz9Dj6CxKvX2AEwkaebZmUzhM1J95 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1Iumvz9Dj6CxKvX2AEwkaebZmUzhM1J95 ' },
-                { id: 3, name: 'Chim bồ câu', imageUrl: 'https://lh3.googleusercontent.com/d/1BsH_WR_EbBcd5gc4wDTIQs6lYi4ull5x ', shadowUrl: 'https://lh3.googleusercontent.com/d/1BsH_WR_EbBcd5gc4wDTIQs6lYi4ull5x ' }
+                { id: 3, name: 'Chim bồ câu', imageUrl: 'https://lh3.googleusercontent.com/d/10kV-b7gJiplbit7Di1rYVCxjTkQ6KXn5 ', shadowUrl: 'https://lh3.googleusercontent.com/d/10kV-b7gJiplbit7Di1rYVCxjTkQ6KXn5 ' }
             ],
             // Trang 2
             [
-                { id: 0, name: 'Chim công', imageUrl: 'https://lh3.googleusercontent.com/d/18dtG6DIq8mrSX2f09uMNDPRVaYwJ6YrI ', shadowUrl: 'https://lh3.googleusercontent.com/d/18dtG6DIq8mrSX2f09uMNDPRVaYwJ6YrI ' },
-                { id: 1, name: 'Chim cú mèo', imageUrl: 'https://lh3.googleusercontent.com/d/1j02yvvbBzZeCnDulVqN1ZW_oCLlQNHdT ', shadowUrl: 'https://lh3.googleusercontent.com/d/1j02yvvbBzZeCnDulVqN1ZW_oCLlQNHdT ' },
+                { id: 0, name: 'Con công', imageUrl: 'https://lh3.googleusercontent.com/d/1H5bPoGs_JeSOcak_42D0HesLUiyOEyqw ', shadowUrl: 'https://lh3.googleusercontent.com/d/1H5bPoGs_JeSOcak_42D0HesLUiyOEyqw ' },
+                { id: 1, name: 'Chim cú mèo', imageUrl: 'https://lh3.googleusercontent.com/d/1N3kIti8QvTt_QKK8L4SbGpUg7dEYLn4T ', shadowUrl: 'https://lh3.googleusercontent.com/d/1N3kIti8QvTt_QKK8L4SbGpUg7dEYLn4T ' },
                 { id: 2, name: 'Chim đại bàng', imageUrl: 'https://lh3.googleusercontent.com/d/12eyqXYNg1n19Srx31H37goo9EbNnEWa5 ', shadowUrl: 'https://lh3.googleusercontent.com/d/12eyqXYNg1n19Srx31H37goo9EbNnEWa5 ' },
                 { id: 3, name: 'Chim sẻ', imageUrl: 'https://lh3.googleusercontent.com/d/18wJismZzqxdD8LLJSCYtv9qDvLALBdcu ', shadowUrl: 'https://lh3.googleusercontent.com/d/18wJismZzqxdD8LLJSCYtv9qDvLALBdcu ' }
             ],
@@ -480,7 +486,73 @@
                 { id: 1, name: 'Con nhện', imageUrl: 'https://lh3.googleusercontent.com/d/1sXPtcihvvby5rppsQPG2jQfTFMlXwlvi ', shadowUrl: 'https://lh3.googleusercontent.com/d/1sXPtcihvvby5rppsQPG2jQfTFMlXwlvi ' },
                 { id: 2, name: 'Con ong', imageUrl: 'https://lh3.googleusercontent.com/d/1nWtn6sVyUNafHnu_79JPzP4dnA3X7ju6 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1nWtn6sVyUNafHnu_79JPzP4dnA3X7ju6 ' },
                 { id: 3, name: 'Con ruồi', imageUrl: 'https://lh3.googleusercontent.com/d/1MRxu3eoEMBOc3NbDHDbJDCXVHZ8OvJda ', shadowUrl: 'https://lh3.googleusercontent.com/d/1MRxu3eoEMBOc3NbDHDbJDCXVHZ8OvJda ' }
-            ]
+            ],
+			[
+				{ id: 0, name: 'Ve sầu', imageUrl: ' https://lh3.googleusercontent.com/d/1Nif8rPqGyqtrkEmCFuytjsd7oY2QZj6j ', shadowUrl: ' https://lh3.googleusercontent.com/d/1Nif8rPqGyqtrkEmCFuytjsd7oY2QZj6j ' },
+				{ id: 1, name: 'Con sứa', imageUrl: ' https://lh3.googleusercontent.com/d/1OAmA_NuF2frc6tGiKYEPxHicfTWl2go1 ', shadowUrl: ' https://lh3.googleusercontent.com/d/1OAmA_NuF2frc6tGiKYEPxHicfTWl2go1 ' },
+				{ id: 2, name: 'Con rùa', imageUrl: ' https://lh3.googleusercontent.com/d/1QixtZ_ittOQLyqnk73JUVxEg7azmk1oO ', shadowUrl: ' https://lh3.googleusercontent.com/d/1QixtZ_ittOQLyqnk73JUVxEg7azmk1oO ' },
+				{ id: 3, name: 'Hải cẩu', imageUrl: ' https://lh3.googleusercontent.com/d/1K3bhHdxGyOGWYfPB5CJDkGgz239mtzqH ', shadowUrl: ' https://lh3.googleusercontent.com/d/1K3bhHdxGyOGWYfPB5CJDkGgz239mtzqH '}
+			],
+			[
+				{ id: 0, name: 'Cá đuối', imageUrl: ' https://lh3.googleusercontent.com/d/1UtB-MduhRH9hGdtBzaQt3nLy8PeaBleJ ', shadowUrl: ' https://lh3.googleusercontent.com/d/1UtB-MduhRH9hGdtBzaQt3nLy8PeaBleJ '},
+				{ id: 1, name: 'Hải mả', imageUrl: ' https://lh3.googleusercontent.com/d/1uAuHkZ92m64WNZeMVVfoc9FUma7vTiK7 ', shadowUrl: ' https://lh3.googleusercontent.com/d/1uAuHkZ92m64WNZeMVVfoc9FUma7vTiK7 ' },
+				{ id: 2, name: 'Óc biển', imageUrl: ' https://lh3.googleusercontent.com/d/1xiBu38y8DAS2oXA723oC9MapzE5Ds6Sl ', shadowUrl: ' https://lh3.googleusercontent.com/d/1xiBu38y8DAS2oXA723oC9MapzE5Ds6Sl ' },
+				{ id: 3, name: 'Con sò', imageUrl: ' https://lh3.googleusercontent.com/d/19HK9FSIFlJq9NxoMhRXNk0FidKonaZgN ', shadowUrl: ' https://lh3.googleusercontent.com/d/19HK9FSIFlJq9NxoMhRXNk0FidKonaZgN ' }
+			],
+			[
+				{ id: 0, name: 'Con cua', imageUrl: ' https://lh3.googleusercontent.com/d/1j5U7iBUk-HljClpl93moj9HRvEc9PgAz ', shadowUrl: ' https://lh3.googleusercontent.com/d/1j5U7iBUk-HljClpl93moj9HRvEc9PgAz ' },
+				{ id: 1, name: 'Cá heo', imageUrl: ' https://lh3.googleusercontent.com/d/1J93_ZEka0T25ypkisUd0Xe6pNxocGnlV ', shadowUrl: ' https://lh3.googleusercontent.com/d/1J93_ZEka0T25ypkisUd0Xe6pNxocGnlV '},
+				{ id: 2, name: 'Sao biển', imageUrl: ' https://lh3.googleusercontent.com/d/1M4Dte6meYphMtcwpMR8anPwkZCGjdzto ', shadowUrl: ' https://lh3.googleusercontent.com/d/1M4Dte6meYphMtcwpMR8anPwkZCGjdzto '},
+				{ id: 3, name: 'Tôm hùm', imageUrl: ' https://lh3.googleusercontent.com/d/1s6402o6dvKCMPR0908BqbqoEVodvjka0 ', shadowUrl: ' https://lh3.googleusercontent.com/d/1s6402o6dvKCMPR0908BqbqoEVodvjka0 '}
+			],
+			[
+				{ id: 0, name: 'Cá mập', imageUrl: ' https://lh3.googleusercontent.com/d/1tj6kvl8KQPWgL3UqgPHCpGl-vsI6h1jk ', shadowUrl: ' https://lh3.googleusercontent.com/d/1tj6kvl8KQPWgL3UqgPHCpGl-vsI6h1jk ' },
+				{ id: 1, name: 'Con mực', imageUrl: ' https://lh3.googleusercontent.com/d/1xiBu38y8DAS2oXA723oC9MapzE5Ds6Sl ', shadowUrl: ' https://lh3.googleusercontent.com/d/1xiBu38y8DAS2oXA723oC9MapzE5Ds6Sl ' },
+				{ id: 2, name: 'Bạch tuộc', imageUrl: ' https://lh3.googleusercontent.com/d/1YY0kiMS2ialYFd9Ut4RQE2tzYYkKog1z ', shadowUrl: ' https://lh3.googleusercontent.com/d/1YY0kiMS2ialYFd9Ut4RQE2tzYYkKog1z '},
+				{ id: 3, name: 'Lạc đà', imageUrl: ' https://lh3.googleusercontent.com/d/117-5hx-lVAz1S0HMVD32fC9rzsDc0xPQ ', shadowUrl: ' https://lh3.googleusercontent.com/d/117-5hx-lVAz1S0HMVD32fC9rzsDc0xPQ '}
+			],
+			[
+				{ id: 0, name: 'Con cáo', imageUrl: ' https://lh3.googleusercontent.com/d/1GHJKK21RrcSxTGaOVodPwQycOcZV2whW ', shadowUrl: ' https://lh3.googleusercontent.com/d/1GHJKK21RrcSxTGaOVodPwQycOcZV2whW '},
+				{ id: 1, name: 'Con báo', imageUrl: ' https://lh3.googleusercontent.com/d/1PJkmRZ5VoIcTn_Seko2g0RZqF3zYZb1X ', shadowUrl: ' https://lh3.googleusercontent.com/d/1PJkmRZ5VoIcTn_Seko2g0RZqF3zYZb1X '},
+				{ id: 2, name: 'Con tê giác', imageUrl: ' https://lh3.googleusercontent.com/d/1m9MFhuSMWvB2Gc7gHGF927yMAjQca8vt ', shadowUrl: ' https://lh3.googleusercontent.com/d/1m9MFhuSMWvB2Gc7gHGF927yMAjQca8vt '},
+				{ id: 3, name: 'Con hải mã', imageUrl: ' https://lh3.googleusercontent.com/d/1j4CEO5ryZiWcyXYVwcR22ocQ9XxA3_Zf ', shadowUrl: ' https://lh3.googleusercontent.com/d/1j4CEO5ryZiWcyXYVwcR22ocQ9XxA3_Zf '}
+			],
+			[
+				{ id: 0, name: 'Con hươu', imageUrl: ' https://lh3.googleusercontent.com/d/1rbSY4u9qjzJISdmHSGrsT7Brl8IjxEB7 ', shadowUrl: ' https://lh3.googleusercontent.com/d/1rbSY4u9qjzJISdmHSGrsT7Brl8IjxEB7 '},
+				{ id: 1, name: 'Con chuột túi', imageUrl: ' https://lh3.googleusercontent.com/d/1PcW1E44qyc0XKXXIsJImESGCMZ4mBS2R ', shadowUrl: ' https://lh3.googleusercontent.com/d/1PcW1E44qyc0XKXXIsJImESGCMZ4mBS2R ' },
+				{ id: 2, name: 'Con bò sữa', imageUrl: ' https://lh3.googleusercontent.com/d/1WoMVMIQ7vBJlLstfbXjPUIzjq6PivzpV ', shadowUrl: ' https://lh3.googleusercontent.com/d/1WoMVMIQ7vBJlLstfbXjPUIzjq6PivzpV '},
+				{ id: 3, name: 'Con lợn', imageUrl: ' https://lh3.googleusercontent.com/d/1bi-cUrfIbk4qOT55yf5gy_S_6ft6lsYK ', shadowUrl: ' https://lh3.googleusercontent.com/d/1bi-cUrfIbk4qOT55yf5gy_S_6ft6lsYK ' }
+			],
+			[
+				{ id: 0, name: 'Con cừu', imageUrl: ' https://lh3.googleusercontent.com/d/1XezFH6x8zUQGP6yWJ-FwAPLcFGkHnDtv ', shadowUrl: ' https://lh3.googleusercontent.com/d/1XezFH6x8zUQGP6yWJ-FwAPLcFGkHnDtv ' },
+				{ id: 1, name: 'Con vịt', imageUrl: ' https://lh3.googleusercontent.com/d/13YWDlIEw_RJhsktDOCLttlEpm4Os-ADD ', shadowUrl: ' https://lh3.googleusercontent.com/d/13YWDlIEw_RJhsktDOCLttlEpm4Os-ADD ' },
+				{ id: 2, name: 'Con thỏ', imageUrl: ' https://lh3.googleusercontent.com/d/1SB7ByuazeB8SYpStw4-cfvtWseGPYOWf ', shadowUrl: ' https://lh3.googleusercontent.com/d/1SB7ByuazeB8SYpStw4-cfvtWseGPYOWf ' },
+				{ id: 3, name: 'Con chó', imageUrl: ' https://lh3.googleusercontent.com/d/13mHxag1JY-PLus_Efv3kK_iQwvkEn_jW ', shadowUrl: ' https://lh3.googleusercontent.com/d/13mHxag1JY-PLus_Efv3kK_iQwvkEn_jW ' }
+			],
+			[
+				{ id: 0, name: 'Con mèo', imageUrl: ' https://lh3.googleusercontent.com/d/1y75Wqcu1fp1nl3--O-CHWD3K9poeU69R ', shadowUrl: ' https://lh3.googleusercontent.com/d/1y75Wqcu1fp1nl3--O-CHWD3K9poeU69R '},
+				{ id: 1, name: 'Con đà điểu', imageUrl: ' https://lh3.googleusercontent.com/d/1jrK2PQ9sY_j-m6bcxu20BRfF9RlW7aeQ ', shadowUrl: ' https://lh3.googleusercontent.com/d/1jrK2PQ9sY_j-m6bcxu20BRfF9RlW7aeQ ' },
+				{ id: 2, name: 'Con ngựa', imageUrl: ' https://lh3.googleusercontent.com/d/1PvpOexUUx4Ik_1h2sc8tjtwCCq9bjEHg ', shadowUrl: ' https://lh3.googleusercontent.com/d/1PvpOexUUx4Ik_1h2sc8tjtwCCq9bjEHg '},
+				{ id: 3, name: 'Con gà trống', imageUrl: ' https://lh3.googleusercontent.com/d/11M0DfGJ_MbA04jYVuyAM6njItUFLULUh ', shadowUrl: ' https://lh3.googleusercontent.com/d/11M0DfGJ_MbA04jYVuyAM6njItUFLULUh ' }
+			],
+			[
+				{ id: 0, name: 'Con hổ', imageUrl: ' https://lh3.googleusercontent.com/d/1quoXnX2UExtwenykRJnn2bdRdI-5mQhW ', shadowUrl: ' https://lh3.googleusercontent.com/d/1quoXnX2UExtwenykRJnn2bdRdI-5mQhW ' },
+				{ id: 1, name: 'Con sư tử', imageUrl: ' https://lh3.googleusercontent.com/d/1-0nkARpnwI93jGL8iAZzM6h37thhokuY ', shadowUrl: ' https://lh3.googleusercontent.com/d/1-0nkARpnwI93jGL8iAZzM6h37thhokuY ' },
+				{ id: 2, name: 'Con voi', imageUrl: ' https://lh3.googleusercontent.com/d/12BSzvFyebiRd2GA08XHYl1G7k-CmmNuf ', shadowUrl: ' https://lh3.googleusercontent.com/d/12BSzvFyebiRd2GA08XHYl1G7k-CmmNuf ' },
+				{ id: 3, name: 'Hươu cao cổ', imageUrl: ' https://lh3.googleusercontent.com/d/1USjCt5Wm9qKyMhUPd5b0KyGyWBTQ2yhm ', shadowUrl: ' https://lh3.googleusercontent.com/d/1USjCt5Wm9qKyMhUPd5b0KyGyWBTQ2yhm ' }
+			],
+			[
+				{ id: 0, name: 'Ngựa vằn', imageUrl: ' https://lh3.googleusercontent.com/d/1TCGYxvts-Vb1r3RQLuXUXWtBu5J1TZeO ', shadowUrl: ' https://lh3.googleusercontent.com/d/1TCGYxvts-Vb1r3RQLuXUXWtBu5J1TZeO ' },
+				{ id: 1, name: 'Con gấu', imageUrl: ' https://lh3.googleusercontent.com/d/1Fp_EVfBYQxsDbUxVw1N5MHHUr5j3prAD ', shadowUrl: ' https://lh3.googleusercontent.com/d/1Fp_EVfBYQxsDbUxVw1N5MHHUr5j3prAD '},
+				{ id: 2, name: 'Con khỉ', imageUrl: ' https://lh3.googleusercontent.com/d/17TfxuDT3SWcKgi0NZ1jlLPUqJn8sWaHu ', shadowUrl: ' https://lh3.googleusercontent.com/d/17TfxuDT3SWcKgi0NZ1jlLPUqJn8sWaHu ' },
+				{ id: 3, name: 'Con sâu', imageUrl: ' https://lh3.googleusercontent.com/d/1gHfycpZ9BMiZYm-0FUgBBtdSc7h4lllb ', shadowUrl: ' https://lh3.googleusercontent.com/d/1gHfycpZ9BMiZYm-0FUgBBtdSc7h4lllb ' }
+			],
+			[
+				{ id: 0, name: 'Cá', imageUrl: '...', shadowUrl: '' },
+				{ id: 1, name: 'Rùa', imageUrl: '...', shadowUrl: '' },
+				{ id: 2, name: 'Ếch', imageUrl: '...', shadowUrl: '' },
+				{ id: 3, name: 'Bướm', imageUrl: '...', shadowUrl: '' }
+			]
     ];
 
     // === STATE ===
@@ -489,7 +561,7 @@
     let currentPairs = PAGES[currentPage];
     let matchedPairs = new Array(currentPairs.length).fill(false);
     let currentShuffledIndices = generateShuffledIndices(currentPairs.length);
-    let selectedImageId = null; // dùng cho chế độ click
+    let selectedImageId = null;
 
     // DOM refs
     const imageColumn = document.getElementById('imageColumn');
@@ -534,9 +606,7 @@
                 <span class="animal-name">${pair.name}</span>
             `;
             card.appendChild(content);
-            // Thêm sự kiện click cho chế độ chọn (dự phòng)
             card.addEventListener('click', onImageClick);
-            // Thêm sự kiện touch riêng để đảm bảo bắt cảm ứng
             card.addEventListener('touchstart', onImageTouchStart, { passive: false });
             imageColumn.appendChild(card);
         });
@@ -558,12 +628,11 @@
                 <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
             `;
             card.appendChild(content);
-            // Thêm sự kiện click cho bóng
             card.addEventListener('click', onShadowClick);
             shadowColumn.appendChild(card);
         });
 
-        // Highlight ảnh đang chọn (chế độ click)
+        // Highlight
         if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
             const imageCards = imageColumn.querySelectorAll('.card-item');
             imageCards.forEach(card => {
@@ -573,7 +642,6 @@
             });
         }
 
-        // Cập nhật trạng thái
         const matchedCount = matchedPairs.filter(v => v).length;
         pairsStatus.textContent = `${matchedCount} / ${currentPairs.length} cặp`;
 
@@ -595,7 +663,7 @@
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
                 feedbackMsg.textContent = `🔍 Đang chọn: ${currentPairs[selectedImageId].name}`;
             } else {
-                feedbackMsg.textContent = '💡 Kéo ảnh vào bóng';
+                feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng';
             }
         }
 
@@ -603,7 +671,7 @@
         prevBtn.disabled = (currentPage === 0);
     }
 
-    // === CHẾ ĐỘ CLICK (DỰ PHÒNG) ===
+    // === CHẾ ĐỘ CLICK ===
     function onImageClick(e) {
         const card = e.currentTarget;
         const id = parseInt(card.dataset.id);
@@ -623,13 +691,10 @@
         render();
     }
 
-    // Xử lý touch cho ảnh (để bắt sự kiện khi click vào ảnh trên điện thoại)
     function onImageTouchStart(e) {
-        // Chỉ xử lý nếu là click ngắn (không kéo)
         const card = e.currentTarget;
         const id = parseInt(card.dataset.id);
         if (matchedPairs[id]) return;
-        // Lưu thời gian touch để phân biệt với kéo
         card._touchStartTime = Date.now();
         card._touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     }
@@ -642,7 +707,7 @@
             return;
         }
         if (selectedImageId === null) {
-            feedbackMsg.textContent = '👆 Chọn ảnh trước (bấm vào ảnh)';
+            feedbackMsg.textContent = '👆 Chọn ảnh trước ';
             return;
         }
         if (matchedPairs[selectedImageId]) {
@@ -671,18 +736,15 @@
     let dragTarget = null;
 
     function initDragDrop() {
-        // Sự kiện touch cho kéo thả
         document.addEventListener('touchstart', onDragStartTouch, { passive: false });
         document.addEventListener('touchmove', onDragMoveTouch, { passive: false });
         document.addEventListener('touchend', onDragEndTouch);
         document.addEventListener('touchcancel', onDragEndTouch);
-        // Sự kiện chuột cho kéo thả
         document.addEventListener('mousedown', onDragStartMouse);
         document.addEventListener('mousemove', onDragMoveMouse);
         document.addEventListener('mouseup', onDragEndMouse);
     }
 
-    // === TOUCH EVENTS ===
     function onDragStartTouch(e) {
         const touch = e.touches[0];
         const el = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -691,7 +753,6 @@
         const id = parseInt(card.dataset.id);
         if (matchedPairs[id]) return;
         e.preventDefault();
-
         startDrag(card, touch.clientX, touch.clientY);
     }
 
@@ -705,14 +766,10 @@
     function onDragEndTouch(e) {
         if (!dragData) return;
         const pos = e.changedTouches ? e.changedTouches[0] : null;
-        if (pos) {
-            endDrag(pos.clientX, pos.clientY);
-        } else {
-            endDrag(null, null);
-        }
+        if (pos) endDrag(pos.clientX, pos.clientY);
+        else endDrag(null, null);
     }
 
-    // === MOUSE EVENTS ===
     function onDragStartMouse(e) {
         const el = document.elementFromPoint(e.clientX, e.clientY);
         const card = el ? el.closest('.card-item[data-type="image"]') : null;
@@ -732,7 +789,6 @@
         endDrag(e.clientX, e.clientY);
     }
 
-    // === HÀM KÉO THẢ CHUNG ===
     function startDrag(card, cx, cy) {
         const rect = card.getBoundingClientRect();
         const clone = document.createElement('div');
@@ -745,9 +801,6 @@
                 const newImg = document.createElement('img');
                 newImg.src = img.src;
                 newImg.alt = img.alt;
-                newImg.style.width = '80%';
-                newImg.style.height = '80%';
-                newImg.style.objectFit = 'contain';
                 clone.appendChild(newImg);
             } else if (emoji) {
                 const newEmoji = document.createElement('span');
@@ -775,7 +828,6 @@
         if (!dragData) return;
         updateClonePosition(cx, cy);
 
-        // Highlight bóng
         document.querySelectorAll('.shadow-card.drag-over').forEach(c => c.classList.remove('drag-over'));
         const el = document.elementFromPoint(cx, cy);
         if (el) {
@@ -813,7 +865,6 @@
                 render();
             }
         } else {
-            // Nếu thả ra ngoài, chỉ cần render lại
             render();
         }
 
