@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🔍 Tìm bóng - Xáo trộn bóng</title>
+    <title>🔍 Tìm bóng - Bóng đen từ ảnh</title>
     <style>
-        /* ===== CSS giữ nguyên như bản trước, chỉ bổ sung thêm style cho fallback emoji ===== */
+        /* ===== CSS giữ nguyên như bản kéo thả, chỉ thay đổi phần bóng ===== */
         * {
             box-sizing: border-box;
             user-select: none;
             margin: 0;
             padding: 0;
-            touch-action: manipulation;
+            touch-action: none;
         }
         html {
             -webkit-text-size-adjust: 100%;
@@ -42,7 +42,7 @@
             max-height: 92vh;
             background: #fefcf7;
             border-radius: 32px 32px 20px 20px;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.18);
             padding: 8px 10px 10px;
             border: 4px solid #fff8ed;
             display: flex;
@@ -68,14 +68,14 @@
         h1 small {
             font-size: clamp(0.5rem, 1.8vw, 0.65rem);
             background: #bcaaa4;
-            color: white;
+            color: #fff;
             padding: 2px 10px;
             border-radius: 40px;
             font-weight: 400;
         }
         .instruction-wrap {
             text-align: center;
-            margin: 0px 0 4px 0;
+            margin: 0 0 4px 0;
         }
         .instruction {
             font-size: clamp(0.55rem, 2vw, 0.75rem);
@@ -127,17 +127,21 @@
             width: 100%;
             aspect-ratio: 1 / 1;
             max-width: 110px;
-            background: #ffffff;
+            background: #fff;
             border-radius: 18px 10px 18px 10px;
-            box-shadow: 0 3px 0 #b8957a, 0 5px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 0 #b8957a, 0 5px 10px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             transition: 0.15s;
-            cursor: pointer;
+            cursor: grab;
             border: 3px solid #f5eee9;
             padding: 3px;
             flex-shrink: 0;
+            position: relative;
+        }
+        .card-item:active {
+            cursor: grabbing;
         }
         .card-content {
             display: flex;
@@ -147,12 +151,14 @@
             width: 100%;
             height: 100%;
             gap: 1px;
+            pointer-events: none;
         }
         .card-image {
             width: 78%;
             height: 72%;
             object-fit: contain;
             display: block;
+            pointer-events: none;
         }
         .animal-name {
             font-size: clamp(0.45rem, 1.6vw, 0.65rem);
@@ -160,14 +166,17 @@
             color: #4e342e;
             text-align: center;
             line-height: 1.2;
+            pointer-events: none;
         }
+        /* ===== BÓNG ĐEN TỪ ẢNH ===== */
         .shadow-card .card-image {
-            filter: grayscale(1) brightness(0.45) drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-            opacity: 0.85;
+            filter: brightness(0) !important; /* biến thành bóng đen */
+            opacity: 1;
         }
         .shadow-card .animal-name {
             display: none;
         }
+        /* ===== CÁC TRẠNG THÁI ===== */
         .card-item.selected {
             box-shadow: 0 0 0 4px #ffb74d, 0 3px 0 #b8957a;
             transform: scale(1.03);
@@ -177,7 +186,7 @@
         .card-item.matched {
             opacity: 0.5;
             filter: grayscale(0.5);
-            box-shadow: 0 2px 0 #6d8f6d, 0 4px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 0 #6d8f6d, 0 4px 8px rgba(0,0,0,0.08);
             border-color: #8bc34a;
             cursor: default;
             pointer-events: none;
@@ -186,18 +195,46 @@
         .card-item.matched .card-image {
             filter: grayscale(0.3) brightness(0.9);
         }
-        .card-item:active:not(.matched):not(.selected) {
-            transform: scale(0.92);
+        .card-item.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+        .shadow-card.drag-over {
+            border-color: #ffb74d;
+            box-shadow: 0 0 0 4px #ffb74d, 0 3px 0 #b8957a;
+        }
+        .drag-clone {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            width: 90px;
+            height: 90px;
+            background: #fff;
+            border-radius: 18px 10px 18px 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #ffa726;
+            padding: 6px;
+            transform: translate(-50%, -50%) scale(1.05);
+            opacity: 0.95;
+        }
+        .drag-clone img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            display: block;
         }
         .shake {
             animation: shake 0.3s ease-in-out;
         }
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
+            0%,100%{ transform: translateX(0); }
+            20%{ transform: translateX(-6px); }
+            40%{ transform: translateX(6px); }
+            60%{ transform: translateX(-4px); }
+            80%{ transform: translateX(4px); }
         }
         .connector-status {
             display: flex;
@@ -244,7 +281,7 @@
             border-radius: 60px;
             font-size: clamp(0.5rem, 1.8vw, 0.75rem);
             font-weight: bold;
-            color: white;
+            color: #fff;
             box-shadow: 0 2px 0 #5d4037;
             cursor: pointer;
             border: 2px solid #8d6e63;
@@ -258,7 +295,7 @@
         }
         .nav-btn:active, .reset-btn:active {
             transform: translateY(2px);
-            box-shadow: 0 0px 0 #5d4037;
+            box-shadow: 0 0 0 #5d4037;
         }
         .nav-btn:disabled {
             opacity: 0.4;
@@ -268,7 +305,7 @@
         }
         .toast {
             background: #4caf50;
-            color: white;
+            color: #fff;
             padding: 1px 12px;
             border-radius: 60px;
             font-weight: 600;
@@ -277,7 +314,7 @@
             opacity: 0;
             transition: 0.2s;
             display: inline-block;
-            margin-top: 0px;
+            margin-top: 0;
             border: 2px solid #388e3c;
         }
         .toast.show {
@@ -287,6 +324,7 @@
         .fallback-emoji {
             font-size: 2.5rem;
             line-height: 1;
+            pointer-events: none;
         }
         @media (max-width: 450px) {
             .app-container { padding: 6px 6px 8px; max-height: 96vh; border-radius: 24px; }
@@ -294,6 +332,7 @@
             .card-image { width: 75%; height: 70%; }
             .card-list { gap: 4px; }
             .column { flex: 1 1 80px; min-width: 60px; gap: 2px; }
+            .drag-clone { width: 75px; height: 75px; }
         }
         @media (max-width: 360px) {
             .app-container { padding: 4px 4px 6px; max-height: 98vh; border-radius: 18px; border-width: 2px; }
@@ -301,6 +340,7 @@
             .card-image { width: 72%; height: 68%; }
             .column { flex: 1 1 60px; min-width: 50px; gap: 2px; }
             .nav-btn, .reset-btn { font-size: clamp(0.4rem, 1.5vw, 0.55rem); padding: 3px 6px; min-width: 32px; box-shadow: 0 1.5px 0 #5d4037; border-width: 1.5px; }
+            .drag-clone { width: 60px; height: 60px; }
             .fallback-emoji { font-size: 1.8rem; }
         }
         @media (max-height: 560px) {
@@ -310,6 +350,7 @@
             .card-list { gap: 3px; }
             .column { gap: 2px; }
             .nav-btn, .reset-btn { font-size: clamp(0.4rem, 1.5vw, 0.6rem); padding: 3px 8px; min-width: 35px; box-shadow: 0 1.5px 0 #5d4037; }
+            .drag-clone { width: 55px; height: 55px; }
             .fallback-emoji { font-size: 1.6rem; }
         }
     </style>
@@ -317,11 +358,11 @@
 <body>
 <div class="app-container">
     <h1>
-        🧩 TÌM BÓNG
-        <small>nối ảnh & bóng</small>
+        🧩 TÌM BÓNG CỦA ẢNH
+
     </h1>
     <div class="instruction-wrap">
-        <div class="instruction">👆 chọn ảnh → chọn bóng</div>
+        <div class="instruction">👆 Kéo ảnh thả vào bóng đen</div>
     </div>
 
     <div class="game-grid">
@@ -337,345 +378,393 @@
 
     <div class="connector-status">
         <span class="status-badge" id="pairsStatus">0 / 4 cặp</span>
-        <span class="status-badge" id="feedbackMessage">💡 chọn ảnh</span>
+        <span class="status-badge" id="feedbackMessage">💡 kéo ảnh thả vào bóng</span>
         <span class="page-indicator" id="pageIndicator">Trang 1 / 2</span>
     </div>
 
     <div class="footer">
-        <button class="nav-btn" id="prevBtn">◀ Trước</button>
+        <button class="nav-btn" id="prevBtn">◀ Trang trước</button>
         <button class="reset-btn" id="resetGameBtn">🔄 Làm mới</button>
-        <button class="nav-btn" id="nextBtn">Tiếp ▶</button>
+        <button class="nav-btn" id="nextBtn">Trang tiếp theo ▶</button>
     </div>
-    <div style="text-align:center; margin-top: 0px;">
+    <div style="text-align:center; margin-top:0;">
         <span class="toast" id="winToast">🎉 Hoàn thành trang!</span>
     </div>
 </div>
 
 <script>
-    (function() {
-        // === ÂM THANH ===
-        let audioCtx = null;
-        function ensureAudioContext() {
-            if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch (e) {}
+(function() {
+    // === ÂM THANH ===
+    let audioCtx = null;
+    function ensureAudioContext() {
+        if (!audioCtx) {
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+        return audioCtx;
+    }
+    function playSound(type) {
+        const ctx = ensureAudioContext();
+        if (!ctx) return;
+        try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1047, ctx.currentTime);
+                osc.frequency.setValueAtTime(1319, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.25);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, ctx.currentTime);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
             }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume().catch(() => {});
-            }
-            return audioCtx;
-        }
-        function playSound(type) {
-            const ctx = ensureAudioContext();
-            if (!ctx) return;
-            try {
-                const oscillator = ctx.createOscillator();
-                const gainNode = ctx.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(ctx.destination);
-                if (type === 'correct') {
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(1047, ctx.currentTime);
-                    oscillator.frequency.setValueAtTime(1319, ctx.currentTime + 0.1);
-                    gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-                    oscillator.start(ctx.currentTime);
-                    oscillator.stop(ctx.currentTime + 0.25);
-                } else if (type === 'wrong') {
-                    oscillator.type = 'sawtooth';
-                    oscillator.frequency.setValueAtTime(180, ctx.currentTime);
-                    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                    oscillator.start(ctx.currentTime);
-                    oscillator.stop(ctx.currentTime + 0.3);
-                }
-            } catch (e) {}
-        }
+        } catch(e) {}
+    }
 
-        // === GIỌNG NÓI ===
-        function speakName(name) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(name);
-                utterance.lang = 'vi-VN';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.1;
-                const voices = window.speechSynthesis.getVoices();
-                const vietnameseVoice = voices.find(v => v.lang.startsWith('vi'));
-                if (vietnameseVoice) utterance.voice = vietnameseVoice;
-                window.speechSynthesis.speak(utterance);
-            }
+    // === GIỌNG NÓI ===
+    function speakName(name) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(name);
+            u.lang = 'vi-VN';
+            u.rate = 0.9;
+            u.pitch = 1.1;
+            const voices = window.speechSynthesis.getVoices();
+            const vn = voices.find(v => v.lang.startsWith('vi'));
+            if (vn) u.voice = vn;
+            window.speechSynthesis.speak(u);
         }
+    }
 
-        // === HÀM XÁO TRỘN (SHUFFLE) ===
-        function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
+    // === XÁO TRỘN ===
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
+        return arr;
+    }
+    function generateShuffledIndices(len) {
+        return shuffleArray([...Array(len).keys()]);
+    }
 
-        function generateShuffledIndices(len) {
-            return shuffleArray([...Array(len).keys()]);
-        }
-
-        // === DỮ LIỆU NHIỀU TRANG ===
-        const PAGES = [
-            // Trang 1
+    // === DỮ LIỆU (thay link ảnh của bạn, ưu tiên PNG nền trong suốt) ===
+    const PAGES = [
             [
-                { id: 0, name: 'Bọ rùa', imageUrl: 'https://lh3.googleusercontent.com/d/1PX4UwvfeHH0Un5Ge2mxc_Y_WyTaQbGnF ', shadowUrl: 'https://lh3.googleusercontent.com/d/1PX4UwvfeHH0Un5Ge2mxc_Y_WyTaQbGnF ' },
-                { id: 1, name: 'Bướm', imageUrl: 'https://lh3.googleusercontent.com/d/1x93dictnbIOyO46Bxl1Rk0a4WyF6y7wy ', shadowUrl: 'https://lh3.googleusercontent.com/d/1x93dictnbIOyO46Bxl1Rk0a4WyF6y7wy ' },
-                { id: 2, name: 'Châu chấu', imageUrl: 'https://lh3.googleusercontent.com/d/1Qc1WzmregnsVKcmrYjpUtpXbLBWrrB5f ', shadowUrl: 'https://lh3.googleusercontent.com/d/1Qc1WzmregnsVKcmrYjpUtpXbLBWrrB5f ' },
-                { id: 3, name: 'Chim bồ câu', imageUrl: 'https://lh3.googleusercontent.com/d/1OMn-zKBmeJUg_lIwh5sUtSHz1dZC1iMe ', shadowUrl: 'https://lh3.googleusercontent.com/d/1OMn-zKBmeJUg_lIwh5sUtSHz1dZC1iMe ' }
+                { id: 0, name: 'Bọ rùa', imageUrl: 'https://lh3.googleusercontent.com/d/1TMIHujR8J2_MsmWbcNqGFVne1mc-lnA9 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1TMIHujR8J2_MsmWbcNqGFVne1mc-lnA9 ' },
+                { id: 1, name: 'Bướm', imageUrl: 'https://lh3.googleusercontent.com/d/1Du_-gAxGAPGe0PDTuaEVx-UKgSPZmAb7 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1Du_-gAxGAPGe0PDTuaEVx-UKgSPZmAb7 ' },
+                { id: 2, name: 'Châu chấu', imageUrl: 'https://lh3.googleusercontent.com/d/1Iumvz9Dj6CxKvX2AEwkaebZmUzhM1J95 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1Iumvz9Dj6CxKvX2AEwkaebZmUzhM1J95 ' },
+                { id: 3, name: 'Chim bồ câu', imageUrl: 'https://lh3.googleusercontent.com/d/1BsH_WR_EbBcd5gc4wDTIQs6lYi4ull5x ', shadowUrl: 'https://lh3.googleusercontent.com/d/1BsH_WR_EbBcd5gc4wDTIQs6lYi4ull5x ' }
             ],
             // Trang 2
             [
-                { id: 0, name: 'Chim công', imageUrl: 'https://lh3.googleusercontent.com/d/1_TAFq9ByocFpDg_D1KZc5rLmCq9Bm5C1 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1_TAFq9ByocFpDg_D1KZc5rLmCq9Bm5C1 ' },
-                { id: 1, name: 'Chim cú mèo', imageUrl: 'https://lh3.googleusercontent.com/d/10TfHjAlZMaC2TxtZXsQyX3CirIDoM--M ', shadowUrl: 'https://lh3.googleusercontent.com/d/10TfHjAlZMaC2TxtZXsQyX3CirIDoM--M ' },
-                { id: 2, name: 'Chim đại bàng', imageUrl: 'https://lh3.googleusercontent.com/d/1tlKJ3pqmApEsrt2f_V5Lo_sPJxA6JqkI ', shadowUrl: 'https://lh3.googleusercontent.com/d/1tlKJ3pqmApEsrt2f_V5Lo_sPJxA6JqkI ' },
-                { id: 3, name: 'Chim sẻ', imageUrl: 'https://lh3.googleusercontent.com/d/1Et2z1Erh56IO6XQCUCV-6JPuHpWHu7WM ', shadowUrl: 'https://lh3.googleusercontent.com/d/1Et2z1Erh56IO6XQCUCV-6JPuHpWHu7WM ' }
+                { id: 0, name: 'Chim công', imageUrl: 'https://lh3.googleusercontent.com/d/18dtG6DIq8mrSX2f09uMNDPRVaYwJ6YrI ', shadowUrl: 'https://lh3.googleusercontent.com/d/18dtG6DIq8mrSX2f09uMNDPRVaYwJ6YrI ' },
+                { id: 1, name: 'Chim cú mèo', imageUrl: 'https://lh3.googleusercontent.com/d/1j02yvvbBzZeCnDulVqN1ZW_oCLlQNHdT ', shadowUrl: 'https://lh3.googleusercontent.com/d/1j02yvvbBzZeCnDulVqN1ZW_oCLlQNHdT ' },
+                { id: 2, name: 'Chim đại bàng', imageUrl: 'https://lh3.googleusercontent.com/d/12eyqXYNg1n19Srx31H37goo9EbNnEWa5 ', shadowUrl: 'https://lh3.googleusercontent.com/d/12eyqXYNg1n19Srx31H37goo9EbNnEWa5 ' },
+                { id: 3, name: 'Chim sẻ', imageUrl: 'https://lh3.googleusercontent.com/d/18wJismZzqxdD8LLJSCYtv9qDvLALBdcu ', shadowUrl: 'https://lh3.googleusercontent.com/d/18wJismZzqxdD8LLJSCYtv9qDvLALBdcu ' }
             ],
 			[
-                { id: 0, name: 'Chuồn chuồn', imageUrl: 'https://lh3.googleusercontent.com/d/1q-svxFdlFlA17t8doLmewN2KVCS3QC0- ', shadowUrl: 'https://lh3.googleusercontent.com/d/1q-svxFdlFlA17t8doLmewN2KVCS3QC0- ' },
-                { id: 1, name: 'Con vẹt', imageUrl: 'https://lh3.googleusercontent.com/d/1OzAYonGLc3Tk0WsyWNxWEMfgw3iQsBxI ', shadowUrl: 'https://lh3.googleusercontent.com/d/1OzAYonGLc3Tk0WsyWNxWEMfgw3iQsBxI ' },
-                { id: 2, name: 'Con dơi', imageUrl: 'https://lh3.googleusercontent.com/d/1oU7m9OvHWONDuzp0itvuOfQoqerI9KX_ ', shadowUrl: 'https://lh3.googleusercontent.com/d/1oU7m9OvHWONDuzp0itvuOfQoqerI9KX_ ' },
-                { id: 3, name: 'Con kiến', imageUrl: 'https://lh3.googleusercontent.com/d/1LU4UgSo1EWg-ss4z6DFSTFMUFYocNbXq ', shadowUrl: 'https://lh3.googleusercontent.com/d/1LU4UgSo1EWg-ss4z6DFSTFMUFYocNbXq ' }
+                { id: 0, name: 'Chuồn chuồn', imageUrl: 'https://lh3.googleusercontent.com/d/1A-JV0WjjQtURgnr-46tkQKMmJn8kpZM- ', shadowUrl: 'https://lh3.googleusercontent.com/d/1A-JV0WjjQtURgnr-46tkQKMmJn8kpZM- ' },
+                { id: 1, name: 'Con vẹt', imageUrl: 'https://lh3.googleusercontent.com/d/1Xe6Z7oX8Kspo182Z2dWR2J6jKrkO_1Gu ', shadowUrl: 'https://lh3.googleusercontent.com/d/1Xe6Z7oX8Kspo182Z2dWR2J6jKrkO_1Gu ' },
+                { id: 2, name: 'Con dơi', imageUrl: 'https://lh3.googleusercontent.com/d/1R4ZFb_7yaqLILkoVyfMp-XKsWBA_aLnn ', shadowUrl: 'https://lh3.googleusercontent.com/d/1R4ZFb_7yaqLILkoVyfMp-XKsWBA_aLnn ' },
+                { id: 3, name: 'Con kiến', imageUrl: 'https://lh3.googleusercontent.com/d/1M3tfCjpTAJkD43_-oNOc2circGSJqJQK ', shadowUrl: 'https://lh3.googleusercontent.com/d/1M3tfCjpTAJkD43_-oNOc2circGSJqJQK ' }
             ],	
 			[
-                { id: 0, name: 'Con muỗi', imageUrl: 'https://lh3.googleusercontent.com/d/1HesfDcHX0IKTyj8jmJgW3ri81AtDCZBh ', shadowUrl: 'https://lh3.googleusercontent.com/d/1HesfDcHX0IKTyj8jmJgW3ri81AtDCZBh ' },
-                { id: 1, name: 'Con nhện', imageUrl: 'https://lh3.googleusercontent.com/d/1NNE7HQYTOb5-uolQIJi_v52hsZ-23DSE ', shadowUrl: 'https://lh3.googleusercontent.com/d/1NNE7HQYTOb5-uolQIJi_v52hsZ-23DSE ' },
-                { id: 2, name: 'Con ong', imageUrl: 'https://lh3.googleusercontent.com/d/1L8EA1YnYtW9hTe-800UXdy8DcLK3oM43 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1L8EA1YnYtW9hTe-800UXdy8DcLK3oM43 ' },
-                { id: 3, name: 'Con ruồi', imageUrl: 'https://lh3.googleusercontent.com/d/1XAjoZcNnsciBnukxnkVgQlymFdfxaLzI ', shadowUrl: 'https://lh3.googleusercontent.com/d/1XAjoZcNnsciBnukxnkVgQlymFdfxaLzI ' }
-            ],
-			[
-                { id: 0, name: 'Chim công', imageUrl: '...', shadowUrl: '...' },
-                { id: 1, name: 'Chim cú mèo', imageUrl: '...', shadowUrl: '...' },
-                { id: 2, name: 'Chim đại bàng', imageUrl: '...', shadowUrl: '...' },
-                { id: 3, name: 'Chim sẻ', imageUrl: '...', shadowUrl: '...' }
+                { id: 0, name: 'Con muỗi', imageUrl: 'https://lh3.googleusercontent.com/d/1SOsRnH8GX_CgbwAKVAoMN-mWrEnss-m2 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1SOsRnH8GX_CgbwAKVAoMN-mWrEnss-m2 ' },
+                { id: 1, name: 'Con nhện', imageUrl: 'https://lh3.googleusercontent.com/d/1sXPtcihvvby5rppsQPG2jQfTFMlXwlvi ', shadowUrl: 'https://lh3.googleusercontent.com/d/1sXPtcihvvby5rppsQPG2jQfTFMlXwlvi ' },
+                { id: 2, name: 'Con ong', imageUrl: 'https://lh3.googleusercontent.com/d/1nWtn6sVyUNafHnu_79JPzP4dnA3X7ju6 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1nWtn6sVyUNafHnu_79JPzP4dnA3X7ju6 ' },
+                { id: 3, name: 'Con ruồi', imageUrl: 'https://lh3.googleusercontent.com/d/1MRxu3eoEMBOc3NbDHDbJDCXVHZ8OvJda ', shadowUrl: 'https://lh3.googleusercontent.com/d/1MRxu3eoEMBOc3NbDHDbJDCXVHZ8OvJda ' }
             ]
-        ];
+    ];
 
-        // === STATE ===
-        let currentPage = 0;
-        let totalPages = PAGES.length;
-        let currentPairs = PAGES[currentPage];
-        let matchedPairs = new Array(currentPairs.length).fill(false);
-        let selectedImageId = null;
-        let currentShuffledIndices = generateShuffledIndices(currentPairs.length);  // thứ tự bóng hiện tại
+    // === STATE ===
+    let currentPage = 0;
+    let totalPages = PAGES.length;
+    let currentPairs = PAGES[currentPage];
+    let matchedPairs = new Array(currentPairs.length).fill(false);
+    let currentShuffledIndices = generateShuffledIndices(currentPairs.length);
 
-        // DOM
-        const imageColumn = document.getElementById('imageColumn');
-        const shadowColumn = document.getElementById('shadowColumn');
-        const pairsStatus = document.getElementById('pairsStatus');
-        const feedbackMsg = document.getElementById('feedbackMessage');
-        const winToast = document.getElementById('winToast');
-        const pageIndicator = document.getElementById('pageIndicator');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const resetBtn = document.getElementById('resetGameBtn');
+    // DOM refs
+    const imageColumn = document.getElementById('imageColumn');
+    const shadowColumn = document.getElementById('shadowColumn');
+    const pairsStatus = document.getElementById('pairsStatus');
+    const feedbackMsg = document.getElementById('feedbackMessage');
+    const winToast = document.getElementById('winToast');
+    const pageIndicator = document.getElementById('pageIndicator');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetGameBtn');
 
-        // === HÀM LẤY EMOJI DỰ PHÒNG ===
-        function getEmoji(name) {
-            const map = {
-                'Chó': '🐶', 'Mèo': '🐱', 'Voi': '🐘', 'Gấu': '🐻',
-                'Hổ': '🐯', 'Khỉ': '🐒', 'Thỏ': '🐰', 'Cáo': '🦊'
-            };
-            return map[name] || '🐾';
-        }
+    // === HÀM LẤY EMOJI DỰ PHÒNG ===
+    function getEmoji(name) {
+        const map = {
+            'Chó':'🐶','Mèo':'🐱','Voi':'🐘','Gấu':'🐻',
+            'Hổ':'🐯','Khỉ':'🐒','Thỏ':'🐰','Cáo':'🦊'
+        };
+        return map[name] || '🐾';
+    }
 
-        // === RENDER ===
-        function render() {
-            imageColumn.innerHTML = '';
-            shadowColumn.innerHTML = '';
+    // === RENDER ===
+    function render() {
+        imageColumn.innerHTML = '';
+        shadowColumn.innerHTML = '';
 
-            // Cột ảnh (giữ nguyên thứ tự)
-            currentPairs.forEach((pair, index) => {
-                const imgCard = document.createElement('div');
-                imgCard.className = 'card-item';
-                if (matchedPairs[index]) imgCard.classList.add('matched');
-                imgCard.dataset.id = index;
-                imgCard.dataset.type = 'image';
-                const imgContent = document.createElement('div');
-                imgContent.className = 'card-content';
-                imgContent.innerHTML = `
-                    <img class="card-image" src="${pair.imageUrl}" alt="${pair.name}" 
-                         loading="lazy" 
-                         onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-emoji').style.display='block';">
-                    <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
-                    <span class="animal-name">${pair.name}</span>
-                `;
-                imgCard.appendChild(imgContent);
-                imgCard.addEventListener('click', onImageClick);
-                imageColumn.appendChild(imgCard);
-            });
-
-            // Cột bóng (theo thứ tự đã xáo trộn)
-            currentShuffledIndices.forEach((originalIndex) => {
-                const pair = currentPairs[originalIndex];
-                const shCard = document.createElement('div');
-                shCard.className = 'card-item shadow-card';
-                if (matchedPairs[originalIndex]) shCard.classList.add('matched');
-                shCard.dataset.id = originalIndex;  // lưu id của cặp
-                shCard.dataset.type = 'shadow';
-                const shContent = document.createElement('div');
-                shContent.className = 'card-content';
-                shContent.innerHTML = `
-                    <img class="card-image" src="${pair.shadowUrl || pair.imageUrl}" alt="${pair.name} bóng" 
-                         loading="lazy"
-                         onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-emoji').style.display='block';">
-                    <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
-                `;
-                shCard.appendChild(shContent);
-                shCard.addEventListener('click', onShadowClick);
-                shadowColumn.appendChild(shCard);
-            });
-
-            // Highlight ảnh đang chọn
-            if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
-                const imageCards = imageColumn.querySelectorAll('.card-item');
-                imageCards.forEach(card => {
-                    if (parseInt(card.dataset.id) === selectedImageId) {
-                        card.classList.add('selected');
-                    }
-                });
-            }
-
-            // Cập nhật trạng thái
-            const matchedCount = matchedPairs.filter(v => v).length;
-            pairsStatus.textContent = `${matchedCount} / ${currentPairs.length} cặp`;
-
-            const isPageComplete = matchedCount === currentPairs.length;
-            if (isPageComplete) {
-                feedbackMsg.textContent = '🎉 Hoàn thành trang!';
-                winToast.classList.add('show');
-                nextBtn.disabled = (currentPage >= totalPages - 1);
-                if (currentPage === totalPages - 1) {
-                    nextBtn.textContent = '🏁 Kết thúc';
-                    nextBtn.disabled = true;
-                } else {
-                    nextBtn.textContent = 'Tiếp ▶';
-                    nextBtn.disabled = false;
-                }
-            } else {
-                winToast.classList.remove('show');
-                nextBtn.disabled = true;
-                if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
-                    feedbackMsg.textContent = `🔍 Đang chọn: ${currentPairs[selectedImageId].name}`;
-                } else {
-                    feedbackMsg.textContent = '💡 Nhấn vào ảnh';
-                }
-            }
-
-            pageIndicator.textContent = `Trang ${currentPage + 1} / ${totalPages}`;
-            prevBtn.disabled = (currentPage === 0);
-        }
-
-        // === SỰ KIỆN ===
-        function onImageClick(e) {
-            const card = e.currentTarget;
-            const id = parseInt(card.dataset.id);
-            const pair = currentPairs[id];
-            speakName(pair.name);
-            if (matchedPairs[id]) {
-                feedbackMsg.textContent = `⛔ ${pair.name} đã nối`;
-                return;
-            }
-            if (selectedImageId === id) {
-                selectedImageId = null;
-                feedbackMsg.textContent = '💡 Đã bỏ chọn';
-                render();
-                return;
-            }
-            selectedImageId = id;
-            feedbackMsg.textContent = `🔍 Đang chọn: ${pair.name}`;
-            render();
-        }
-
-        function onShadowClick(e) {
-            const card = e.currentTarget;
-            const shadowId = parseInt(card.dataset.id); // lấy id của cặp gốc
-            if (matchedPairs[shadowId]) {
-                feedbackMsg.textContent = `⛔ Bóng đã nối`;
-                return;
-            }
-            if (selectedImageId === null) {
-                feedbackMsg.textContent = '👆 Chọn ảnh trước';
-                return;
-            }
-            if (matchedPairs[selectedImageId]) {
-                selectedImageId = null;
-                feedbackMsg.textContent = '⚠️ Ảnh đã nối, chọn ảnh khác';
-                render();
-                return;
-            }
-            if (selectedImageId === shadowId) {
-                // Nối đúng
-                matchedPairs[selectedImageId] = true;
-                selectedImageId = null;
-                feedbackMsg.textContent = '✅ Nối đúng!';
-                playSound('correct');
-                render();
-            } else {
-                // Sai
-                feedbackMsg.textContent = `❌ Sai! ${currentPairs[selectedImageId].name} không khớp`;
-                playSound('wrong');
-                render();
-                card.classList.add('shake');
-                setTimeout(() => card.classList.remove('shake'), 300);
-            }
-        }
-
-        // === CHUYỂN TRANG ===
-        function goToPage(page) {
-            if (page < 0 || page >= totalPages) return;
-            const matchedCount = matchedPairs.filter(v => v).length;
-            if (page > currentPage && matchedCount < currentPairs.length) {
-                feedbackMsg.textContent = '⚠️ Hãy nối hết các cặp trước khi sang trang mới!';
-                return;
-            }
-            currentPage = page;
-            currentPairs = PAGES[currentPage];
-            matchedPairs = new Array(currentPairs.length).fill(false);
-            selectedImageId = null;
-            // Tạo xáo trộn mới cho bóng
-            currentShuffledIndices = generateShuffledIndices(currentPairs.length);
-            winToast.classList.remove('show');
-            feedbackMsg.textContent = `📖 Trang ${currentPage + 1}`;
-            render();
-        }
-
-        // === RESET TRANG ===
-        function resetGame() {
-            matchedPairs = new Array(currentPairs.length).fill(false);
-            selectedImageId = null;
-            // Xáo trộn lại bóng
-            currentShuffledIndices = generateShuffledIndices(currentPairs.length);
-            winToast.classList.remove('show');
-            feedbackMsg.textContent = '🔄 Đã làm mới trang';
-            render();
-        }
-
-        // === GÁN SỰ KIỆN ===
-        prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
-        nextBtn.addEventListener('click', () => {
-            if (currentPage < totalPages - 1) goToPage(currentPage + 1);
+        // Cột ảnh
+        currentPairs.forEach((pair, index) => {
+            const card = document.createElement('div');
+            card.className = 'card-item';
+            if (matchedPairs[index]) card.classList.add('matched');
+            card.dataset.id = index;
+            card.dataset.type = 'image';
+            const content = document.createElement('div');
+            content.className = 'card-content';
+            content.innerHTML = `
+                <img class="card-image" src="${pair.imageUrl}" alt="${pair.name}" loading="lazy"
+                     onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-emoji').style.display='block';">
+                <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
+                <span class="animal-name">${pair.name}</span>
+            `;
+            card.appendChild(content);
+            imageColumn.appendChild(card);
         });
-        resetBtn.addEventListener('click', resetGame);
 
-        // === KHỞI TẠO ===
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.getVoices();
-            window.speechSynthesis.onvoiceschanged = () => {
-                window.speechSynthesis.getVoices();
-            };
+        // Cột bóng (theo thứ tự xáo trộn, dùng ảnh màu + filter brightness(0) để tạo bóng đen)
+        currentShuffledIndices.forEach((origIdx) => {
+            const pair = currentPairs[origIdx];
+            const card = document.createElement('div');
+            card.className = 'card-item shadow-card';
+            if (matchedPairs[origIdx]) card.classList.add('matched');
+            card.dataset.id = origIdx;
+            card.dataset.type = 'shadow';
+            const content = document.createElement('div');
+            content.className = 'card-content';
+            // Nếu có shadowUrl riêng và khác imageUrl thì dùng, ngược lại dùng imageUrl (sẽ được filter thành đen)
+            const shadowSrc = (pair.shadowUrl && pair.shadowUrl !== pair.imageUrl) ? pair.shadowUrl : pair.imageUrl;
+            content.innerHTML = `
+                <img class="card-image" src="${shadowSrc}" alt="${pair.name} bóng" loading="lazy"
+                     onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-emoji').style.display='block';">
+                <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
+            `;
+            card.appendChild(content);
+            shadowColumn.appendChild(card);
+        });
+
+        // Cập nhật trạng thái
+        const matchedCount = matchedPairs.filter(v => v).length;
+        pairsStatus.textContent = `${matchedCount} / ${currentPairs.length} cặp`;
+
+        const isComplete = matchedCount === currentPairs.length;
+        if (isComplete) {
+            feedbackMsg.textContent = '🎉 Hoàn thành trang!';
+            winToast.classList.add('show');
+            nextBtn.disabled = (currentPage >= totalPages - 1);
+            if (currentPage === totalPages - 1) {
+                nextBtn.textContent = '🏁 Kết thúc';
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.textContent = 'Tiếp ▶';
+                nextBtn.disabled = false;
+            }
+        } else {
+            winToast.classList.remove('show');
+            nextBtn.disabled = true;
+            feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng đen';
         }
+
+        pageIndicator.textContent = `Trang ${currentPage+1} / ${totalPages}`;
+        prevBtn.disabled = (currentPage === 0);
+    }
+
+    // === KÉO THẢ ===
+    let dragData = null;
+
+    function initDragDrop() {
+        document.addEventListener('mousedown', onDragStart);
+        document.addEventListener('touchstart', onDragStart, { passive: false });
+        document.addEventListener('mousemove', onDragMove);
+        document.addEventListener('touchmove', onDragMove, { passive: false });
+        document.addEventListener('mouseup', onDragEnd);
+        document.addEventListener('touchend', onDragEnd);
+        document.addEventListener('touchcancel', onDragEnd);
+    }
+
+    function getEventPos(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+        }
+        return { clientX: e.clientX, clientY: e.clientY };
+    }
+
+    function onDragStart(e) {
+        let target = e.target;
+        let card = target.closest('.card-item[data-type="image"]');
+        if (!card) return;
+        const id = parseInt(card.dataset.id);
+        if (matchedPairs[id]) return;
+        e.preventDefault();
+
+        const pos = getEventPos(e);
+        const rect = card.getBoundingClientRect();
+
+        const clone = document.createElement('div');
+        clone.className = 'drag-clone';
+        const content = card.querySelector('.card-content');
+        if (content) {
+            const img = content.querySelector('img');
+            const emoji = content.querySelector('.fallback-emoji');
+            if (img && img.style.display !== 'none') {
+                const newImg = document.createElement('img');
+                newImg.src = img.src;
+                newImg.alt = img.alt;
+                newImg.style.width = '80%';
+                newImg.style.height = '80%';
+                newImg.style.objectFit = 'contain';
+                clone.appendChild(newImg);
+            } else if (emoji) {
+                const newEmoji = document.createElement('span');
+                newEmoji.textContent = emoji.textContent;
+                newEmoji.style.fontSize = '2.5rem';
+                clone.appendChild(newEmoji);
+            }
+        }
+        document.body.appendChild(clone);
+
+        dragData = {
+            element: card,
+            clone: clone,
+            offsetX: pos.clientX - rect.left,
+            offsetY: pos.clientY - rect.top,
+            id: id,
+            startX: pos.clientX,
+            startY: pos.clientY
+        };
+        card.classList.add('dragging');
+
+        const pair = currentPairs[id];
+        speakName(pair.name);
+        updateClonePosition(pos.clientX, pos.clientY);
+    }
+
+    function onDragMove(e) {
+        if (!dragData) return;
+        e.preventDefault();
+        const pos = getEventPos(e);
+        updateClonePosition(pos.clientX, pos.clientY);
+
+        // Highlight bóng
+        document.querySelectorAll('.shadow-card.drag-over').forEach(c => c.classList.remove('drag-over'));
+        const el = document.elementFromPoint(pos.clientX, pos.clientY);
+        if (el) {
+            const shadowCard = el.closest('.shadow-card');
+            if (shadowCard && !matchedPairs[parseInt(shadowCard.dataset.id)]) {
+                shadowCard.classList.add('drag-over');
+            }
+        }
+    }
+
+    function onDragEnd(e) {
+        if (!dragData) return;
+        document.querySelectorAll('.shadow-card.drag-over').forEach(c => c.classList.remove('drag-over'));
+
+        const pos = getEventPos(e);
+        const el = document.elementFromPoint(pos.clientX, pos.clientY);
+        let targetShadow = null;
+        if (el) {
+            targetShadow = el.closest('.shadow-card');
+        }
+
+        if (targetShadow && !matchedPairs[parseInt(targetShadow.dataset.id)]) {
+            const shadowId = parseInt(targetShadow.dataset.id);
+            const imageId = dragData.id;
+            if (imageId === shadowId) {
+                matchedPairs[imageId] = true;
+                playSound('correct');
+                feedbackMsg.textContent = '✅ Nối đúng!';
+                render();
+            } else {
+                playSound('wrong');
+                feedbackMsg.textContent = `❌ Sai! ${currentPairs[imageId].name} không khớp`;
+                targetShadow.classList.add('shake');
+                setTimeout(() => targetShadow.classList.remove('shake'), 300);
+                dragData.element.classList.add('shake');
+                setTimeout(() => dragData.element.classList.remove('shake'), 300);
+                render();
+            }
+        } else {
+            render();
+        }
+
+        if (dragData.clone && dragData.clone.parentNode) {
+            dragData.clone.parentNode.removeChild(dragData.clone);
+        }
+        if (dragData.element) {
+            dragData.element.classList.remove('dragging');
+        }
+        dragData = null;
+    }
+
+    function updateClonePosition(cx, cy) {
+        if (!dragData || !dragData.clone) return;
+        dragData.clone.style.left = cx + 'px';
+        dragData.clone.style.top = cy + 'px';
+    }
+
+    // === CHUYỂN TRANG ===
+    function goToPage(page) {
+        if (page < 0 || page >= totalPages) return;
+        const matchedCount = matchedPairs.filter(v => v).length;
+        if (page > currentPage && matchedCount < currentPairs.length) {
+            feedbackMsg.textContent = '⚠️ Hãy nối hết các cặp trước khi sang trang mới!';
+            return;
+        }
+        currentPage = page;
+        currentPairs = PAGES[currentPage];
+        matchedPairs = new Array(currentPairs.length).fill(false);
+        currentShuffledIndices = generateShuffledIndices(currentPairs.length);
+        winToast.classList.remove('show');
+        feedbackMsg.textContent = `📖 Trang ${currentPage+1}`;
         render();
-        feedbackMsg.textContent = '💡 Nhấn vào ảnh để bắt đầu';
-        document.addEventListener('touchstart', () => ensureAudioContext(), { once: true });
-        document.addEventListener('click', () => ensureAudioContext(), { once: true });
-    })();
+    }
+
+    function resetGame() {
+        matchedPairs = new Array(currentPairs.length).fill(false);
+        currentShuffledIndices = generateShuffledIndices(currentPairs.length);
+        winToast.classList.remove('show');
+        feedbackMsg.textContent = '🔄 Đã làm mới trang';
+        render();
+    }
+
+    // === GÁN SỰ KIỆN ===
+    prevBtn.addEventListener('click', () => goToPage(currentPage-1));
+    nextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages - 1) goToPage(currentPage+1);
+    });
+    resetBtn.addEventListener('click', resetGame);
+
+    // === KHỞI TẠO ===
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+    }
+
+    initDragDrop();
+    render();
+    feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng đen';
+
+    document.addEventListener('touchstart', () => ensureAudioContext(), { once: true });
+    document.addEventListener('click', () => ensureAudioContext(), { once: true });
+})();
 </script>
 </body>
 </html>
