@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🔍 Tìm bóng - Sửa lỗi cảm ứng</title>
+    <title>🔍 Tìm bóng của ảnh</title>
     <style>
         * {
             box-sizing: border-box;
@@ -359,7 +359,7 @@
 
     </h1>
     <div class="instruction-wrap">
-        <div class="instruction">👆 Kéo ảnh thả vào bóng đen (hoặc bấm chọn)</div>
+        <div class="instruction">👆 Kéo ảnh thả vào bóng</div>
     </div>
 
     <div class="game-grid">
@@ -375,7 +375,7 @@
 
     <div class="connector-status">
         <span class="status-badge" id="pairsStatus">0 / 4 cặp</span>
-        <span class="status-badge" id="feedbackMessage">💡 Kéo hoặc bấm chọn</span>
+        <span class="status-badge" id="feedbackMessage">💡 Kéo ảnh vào bóng</span>
         <span class="page-indicator" id="pageIndicator">Trang 1 / 4</span>
     </div>
 
@@ -595,7 +595,7 @@
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
                 feedbackMsg.textContent = `🔍 Đang chọn: ${currentPairs[selectedImageId].name}`;
             } else {
-                feedbackMsg.textContent = '💡 Kéo hoặc bấm chọn ảnh → bấm bóng';
+                feedbackMsg.textContent = '💡 Kéo ảnh vào bóng';
             }
         }
 
@@ -877,7 +877,7 @@
 
     initDragDrop();
     render();
-    feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng đen (hoặc bấm chọn)';
+    feedbackMsg.textContent = '💡 Kéo ảnh vào bóng';
 
     document.addEventListener('touchstart', () => ensureAudioContext(), { once: true });
     document.addEventListener('click', () => ensureAudioContext(), { once: true });
