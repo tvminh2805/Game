@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🔍 Tìm bóng - Bóng đen từ ảnh</title>
+    <title>🔍 Tìm bóng - Sửa lỗi cảm ứng</title>
     <style>
-        /* ===== CSS giữ nguyên như bản kéo thả, chỉ thay đổi phần bóng ===== */
         * {
             box-sizing: border-box;
             user-select: none;
             margin: 0;
             padding: 0;
-            touch-action: none;
+            touch-action: none; /* Ngăn cuộn/zoom khi tương tác */
         }
         html {
             -webkit-text-size-adjust: 100%;
@@ -32,8 +31,6 @@
             padding: 4px;
             height: 100vh;
             max-height: 100vh;
-            zoom: 1;
-            transform: scale(1);
         }
         .app-container {
             max-width: 600px;
@@ -49,8 +46,6 @@
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
-            zoom: 1;
-            transform: scale(1);
         }
         h1 {
             text-align: center;
@@ -133,12 +128,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.15s;
             cursor: grab;
             border: 3px solid #f5eee9;
             padding: 3px;
             flex-shrink: 0;
             position: relative;
+            transition: 0.15s;
         }
         .card-item:active {
             cursor: grabbing;
@@ -170,7 +165,7 @@
         }
         /* ===== BÓNG ĐEN TỪ ẢNH ===== */
         .shadow-card .card-image {
-            filter: brightness(0) !important; /* biến thành bóng đen */
+            filter: brightness(0) contrast(1.2) !important;
             opacity: 1;
         }
         .shadow-card .animal-name {
@@ -202,6 +197,7 @@
         .shadow-card.drag-over {
             border-color: #ffb74d;
             box-shadow: 0 0 0 4px #ffb74d, 0 3px 0 #b8957a;
+            background: #fff8e1;
         }
         .drag-clone {
             position: fixed;
@@ -326,6 +322,7 @@
             line-height: 1;
             pointer-events: none;
         }
+        /* Responsive */
         @media (max-width: 450px) {
             .app-container { padding: 6px 6px 8px; max-height: 96vh; border-radius: 24px; }
             .card-item { max-width: 85px; border-radius: 14px 8px 14px 8px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08); padding: 2px; }
@@ -362,7 +359,7 @@
 
     </h1>
     <div class="instruction-wrap">
-        <div class="instruction">👆 Kéo ảnh thả vào bóng đen</div>
+        <div class="instruction">👆 Kéo ảnh thả vào bóng đen (hoặc bấm chọn)</div>
     </div>
 
     <div class="game-grid">
@@ -378,14 +375,14 @@
 
     <div class="connector-status">
         <span class="status-badge" id="pairsStatus">0 / 4 cặp</span>
-        <span class="status-badge" id="feedbackMessage">💡 kéo ảnh thả vào bóng</span>
-        <span class="page-indicator" id="pageIndicator">Trang 1 / 2</span>
+        <span class="status-badge" id="feedbackMessage">💡 Kéo hoặc bấm chọn</span>
+        <span class="page-indicator" id="pageIndicator">Trang 1 / 4</span>
     </div>
 
     <div class="footer">
-        <button class="nav-btn" id="prevBtn">◀ Trang trước</button>
+        <button class="nav-btn" id="prevBtn">◀ Trước</button>
         <button class="reset-btn" id="resetGameBtn">🔄 Làm mới</button>
-        <button class="nav-btn" id="nextBtn">Trang tiếp theo ▶</button>
+        <button class="nav-btn" id="nextBtn">Tiếp ▶</button>
     </div>
     <div style="text-align:center; margin-top:0;">
         <span class="toast" id="winToast">🎉 Hoàn thành trang!</span>
@@ -457,7 +454,7 @@
         return shuffleArray([...Array(len).keys()]);
     }
 
-    // === DỮ LIỆU (thay link ảnh của bạn, ưu tiên PNG nền trong suốt) ===
+    // === DỮ LIỆU (có thể thay ảnh của bạn) ===
     const PAGES = [
             [
                 { id: 0, name: 'Bọ rùa', imageUrl: 'https://lh3.googleusercontent.com/d/1TMIHujR8J2_MsmWbcNqGFVne1mc-lnA9 ', shadowUrl: 'https://lh3.googleusercontent.com/d/1TMIHujR8J2_MsmWbcNqGFVne1mc-lnA9 ' },
@@ -492,6 +489,7 @@
     let currentPairs = PAGES[currentPage];
     let matchedPairs = new Array(currentPairs.length).fill(false);
     let currentShuffledIndices = generateShuffledIndices(currentPairs.length);
+    let selectedImageId = null; // dùng cho chế độ click
 
     // DOM refs
     const imageColumn = document.getElementById('imageColumn');
@@ -508,7 +506,9 @@
     function getEmoji(name) {
         const map = {
             'Chó':'🐶','Mèo':'🐱','Voi':'🐘','Gấu':'🐻',
-            'Hổ':'🐯','Khỉ':'🐒','Thỏ':'🐰','Cáo':'🦊'
+            'Hổ':'🐯','Khỉ':'🐒','Thỏ':'🐰','Cáo':'🦊',
+            'Sư tử':'🦁','Nai':'🦌','Sóc':'🐿️','Chim':'🐦',
+            'Cá':'🐟','Rùa':'🐢','Ếch':'🐸','Bướm':'🦋'
         };
         return map[name] || '🐾';
     }
@@ -534,10 +534,14 @@
                 <span class="animal-name">${pair.name}</span>
             `;
             card.appendChild(content);
+            // Thêm sự kiện click cho chế độ chọn (dự phòng)
+            card.addEventListener('click', onImageClick);
+            // Thêm sự kiện touch riêng để đảm bảo bắt cảm ứng
+            card.addEventListener('touchstart', onImageTouchStart, { passive: false });
             imageColumn.appendChild(card);
         });
 
-        // Cột bóng (theo thứ tự xáo trộn, dùng ảnh màu + filter brightness(0) để tạo bóng đen)
+        // Cột bóng
         currentShuffledIndices.forEach((origIdx) => {
             const pair = currentPairs[origIdx];
             const card = document.createElement('div');
@@ -547,7 +551,6 @@
             card.dataset.type = 'shadow';
             const content = document.createElement('div');
             content.className = 'card-content';
-            // Nếu có shadowUrl riêng và khác imageUrl thì dùng, ngược lại dùng imageUrl (sẽ được filter thành đen)
             const shadowSrc = (pair.shadowUrl && pair.shadowUrl !== pair.imageUrl) ? pair.shadowUrl : pair.imageUrl;
             content.innerHTML = `
                 <img class="card-image" src="${shadowSrc}" alt="${pair.name} bóng" loading="lazy"
@@ -555,8 +558,20 @@
                 <span class="fallback-emoji" style="display:none;">${getEmoji(pair.name)}</span>
             `;
             card.appendChild(content);
+            // Thêm sự kiện click cho bóng
+            card.addEventListener('click', onShadowClick);
             shadowColumn.appendChild(card);
         });
+
+        // Highlight ảnh đang chọn (chế độ click)
+        if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
+            const imageCards = imageColumn.querySelectorAll('.card-item');
+            imageCards.forEach(card => {
+                if (parseInt(card.dataset.id) === selectedImageId) {
+                    card.classList.add('selected');
+                }
+            });
+        }
 
         // Cập nhật trạng thái
         const matchedCount = matchedPairs.filter(v => v).length;
@@ -577,44 +592,149 @@
         } else {
             winToast.classList.remove('show');
             nextBtn.disabled = true;
-            feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng đen';
+            if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
+                feedbackMsg.textContent = `🔍 Đang chọn: ${currentPairs[selectedImageId].name}`;
+            } else {
+                feedbackMsg.textContent = '💡 Kéo hoặc bấm chọn ảnh → bấm bóng';
+            }
         }
 
         pageIndicator.textContent = `Trang ${currentPage+1} / ${totalPages}`;
         prevBtn.disabled = (currentPage === 0);
     }
 
+    // === CHẾ ĐỘ CLICK (DỰ PHÒNG) ===
+    function onImageClick(e) {
+        const card = e.currentTarget;
+        const id = parseInt(card.dataset.id);
+        if (matchedPairs[id]) {
+            feedbackMsg.textContent = `⛔ ${currentPairs[id].name} đã nối`;
+            return;
+        }
+        if (selectedImageId === id) {
+            selectedImageId = null;
+            feedbackMsg.textContent = '💡 Đã bỏ chọn';
+            render();
+            return;
+        }
+        selectedImageId = id;
+        feedbackMsg.textContent = `🔍 Đang chọn: ${currentPairs[id].name}`;
+        speakName(currentPairs[id].name);
+        render();
+    }
+
+    // Xử lý touch cho ảnh (để bắt sự kiện khi click vào ảnh trên điện thoại)
+    function onImageTouchStart(e) {
+        // Chỉ xử lý nếu là click ngắn (không kéo)
+        const card = e.currentTarget;
+        const id = parseInt(card.dataset.id);
+        if (matchedPairs[id]) return;
+        // Lưu thời gian touch để phân biệt với kéo
+        card._touchStartTime = Date.now();
+        card._touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+
+    function onShadowClick(e) {
+        const card = e.currentTarget;
+        const shadowId = parseInt(card.dataset.id);
+        if (matchedPairs[shadowId]) {
+            feedbackMsg.textContent = `⛔ Bóng đã nối`;
+            return;
+        }
+        if (selectedImageId === null) {
+            feedbackMsg.textContent = '👆 Chọn ảnh trước (bấm vào ảnh)';
+            return;
+        }
+        if (matchedPairs[selectedImageId]) {
+            selectedImageId = null;
+            feedbackMsg.textContent = '⚠️ Ảnh đã nối, chọn ảnh khác';
+            render();
+            return;
+        }
+        if (selectedImageId === shadowId) {
+            matchedPairs[selectedImageId] = true;
+            selectedImageId = null;
+            feedbackMsg.textContent = '✅ Nối đúng!';
+            playSound('correct');
+            render();
+        } else {
+            feedbackMsg.textContent = `❌ Sai! ${currentPairs[selectedImageId].name} không khớp`;
+            playSound('wrong');
+            render();
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 300);
+        }
+    }
+
     // === KÉO THẢ ===
     let dragData = null;
+    let dragTarget = null;
 
     function initDragDrop() {
-        document.addEventListener('mousedown', onDragStart);
-        document.addEventListener('touchstart', onDragStart, { passive: false });
-        document.addEventListener('mousemove', onDragMove);
-        document.addEventListener('touchmove', onDragMove, { passive: false });
-        document.addEventListener('mouseup', onDragEnd);
-        document.addEventListener('touchend', onDragEnd);
-        document.addEventListener('touchcancel', onDragEnd);
+        // Sự kiện touch cho kéo thả
+        document.addEventListener('touchstart', onDragStartTouch, { passive: false });
+        document.addEventListener('touchmove', onDragMoveTouch, { passive: false });
+        document.addEventListener('touchend', onDragEndTouch);
+        document.addEventListener('touchcancel', onDragEndTouch);
+        // Sự kiện chuột cho kéo thả
+        document.addEventListener('mousedown', onDragStartMouse);
+        document.addEventListener('mousemove', onDragMoveMouse);
+        document.addEventListener('mouseup', onDragEndMouse);
     }
 
-    function getEventPos(e) {
-        if (e.touches && e.touches.length > 0) {
-            return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
-        }
-        return { clientX: e.clientX, clientY: e.clientY };
-    }
-
-    function onDragStart(e) {
-        let target = e.target;
-        let card = target.closest('.card-item[data-type="image"]');
+    // === TOUCH EVENTS ===
+    function onDragStartTouch(e) {
+        const touch = e.touches[0];
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        const card = el ? el.closest('.card-item[data-type="image"]') : null;
         if (!card) return;
         const id = parseInt(card.dataset.id);
         if (matchedPairs[id]) return;
         e.preventDefault();
 
-        const pos = getEventPos(e);
-        const rect = card.getBoundingClientRect();
+        startDrag(card, touch.clientX, touch.clientY);
+    }
 
+    function onDragMoveTouch(e) {
+        if (!dragData) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        moveDrag(touch.clientX, touch.clientY);
+    }
+
+    function onDragEndTouch(e) {
+        if (!dragData) return;
+        const pos = e.changedTouches ? e.changedTouches[0] : null;
+        if (pos) {
+            endDrag(pos.clientX, pos.clientY);
+        } else {
+            endDrag(null, null);
+        }
+    }
+
+    // === MOUSE EVENTS ===
+    function onDragStartMouse(e) {
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const card = el ? el.closest('.card-item[data-type="image"]') : null;
+        if (!card) return;
+        const id = parseInt(card.dataset.id);
+        if (matchedPairs[id]) return;
+        startDrag(card, e.clientX, e.clientY);
+    }
+
+    function onDragMoveMouse(e) {
+        if (!dragData) return;
+        moveDrag(e.clientX, e.clientY);
+    }
+
+    function onDragEndMouse(e) {
+        if (!dragData) return;
+        endDrag(e.clientX, e.clientY);
+    }
+
+    // === HÀM KÉO THẢ CHUNG ===
+    function startDrag(card, cx, cy) {
+        const rect = card.getBoundingClientRect();
         const clone = document.createElement('div');
         clone.className = 'drag-clone';
         const content = card.querySelector('.card-content');
@@ -641,65 +761,59 @@
         dragData = {
             element: card,
             clone: clone,
-            offsetX: pos.clientX - rect.left,
-            offsetY: pos.clientY - rect.top,
-            id: id,
-            startX: pos.clientX,
-            startY: pos.clientY
+            offsetX: cx - rect.left,
+            offsetY: cy - rect.top,
+            id: parseInt(card.dataset.id),
         };
         card.classList.add('dragging');
-
-        const pair = currentPairs[id];
+        const pair = currentPairs[parseInt(card.dataset.id)];
         speakName(pair.name);
-        updateClonePosition(pos.clientX, pos.clientY);
+        updateClonePosition(cx, cy);
     }
 
-    function onDragMove(e) {
+    function moveDrag(cx, cy) {
         if (!dragData) return;
-        e.preventDefault();
-        const pos = getEventPos(e);
-        updateClonePosition(pos.clientX, pos.clientY);
+        updateClonePosition(cx, cy);
 
         // Highlight bóng
         document.querySelectorAll('.shadow-card.drag-over').forEach(c => c.classList.remove('drag-over'));
-        const el = document.elementFromPoint(pos.clientX, pos.clientY);
+        const el = document.elementFromPoint(cx, cy);
         if (el) {
             const shadowCard = el.closest('.shadow-card');
             if (shadowCard && !matchedPairs[parseInt(shadowCard.dataset.id)]) {
                 shadowCard.classList.add('drag-over');
+                dragTarget = shadowCard;
+            } else {
+                dragTarget = null;
             }
+        } else {
+            dragTarget = null;
         }
     }
 
-    function onDragEnd(e) {
-        if (!dragData) return;
+    function endDrag(cx, cy) {
         document.querySelectorAll('.shadow-card.drag-over').forEach(c => c.classList.remove('drag-over'));
 
-        const pos = getEventPos(e);
-        const el = document.elementFromPoint(pos.clientX, pos.clientY);
-        let targetShadow = null;
-        if (el) {
-            targetShadow = el.closest('.shadow-card');
-        }
-
-        if (targetShadow && !matchedPairs[parseInt(targetShadow.dataset.id)]) {
-            const shadowId = parseInt(targetShadow.dataset.id);
+        if (dragTarget && cx !== null && cy !== null) {
+            const shadowId = parseInt(dragTarget.dataset.id);
             const imageId = dragData.id;
             if (imageId === shadowId) {
                 matchedPairs[imageId] = true;
                 playSound('correct');
                 feedbackMsg.textContent = '✅ Nối đúng!';
+                selectedImageId = null;
                 render();
             } else {
                 playSound('wrong');
                 feedbackMsg.textContent = `❌ Sai! ${currentPairs[imageId].name} không khớp`;
-                targetShadow.classList.add('shake');
-                setTimeout(() => targetShadow.classList.remove('shake'), 300);
+                dragTarget.classList.add('shake');
+                setTimeout(() => dragTarget.classList.remove('shake'), 300);
                 dragData.element.classList.add('shake');
                 setTimeout(() => dragData.element.classList.remove('shake'), 300);
                 render();
             }
         } else {
+            // Nếu thả ra ngoài, chỉ cần render lại
             render();
         }
 
@@ -710,6 +824,7 @@
             dragData.element.classList.remove('dragging');
         }
         dragData = null;
+        dragTarget = null;
     }
 
     function updateClonePosition(cx, cy) {
@@ -730,6 +845,7 @@
         currentPairs = PAGES[currentPage];
         matchedPairs = new Array(currentPairs.length).fill(false);
         currentShuffledIndices = generateShuffledIndices(currentPairs.length);
+        selectedImageId = null;
         winToast.classList.remove('show');
         feedbackMsg.textContent = `📖 Trang ${currentPage+1}`;
         render();
@@ -738,6 +854,7 @@
     function resetGame() {
         matchedPairs = new Array(currentPairs.length).fill(false);
         currentShuffledIndices = generateShuffledIndices(currentPairs.length);
+        selectedImageId = null;
         winToast.classList.remove('show');
         feedbackMsg.textContent = '🔄 Đã làm mới trang';
         render();
@@ -760,7 +877,7 @@
 
     initDragDrop();
     render();
-    feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng đen';
+    feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng đen (hoặc bấm chọn)';
 
     document.addEventListener('touchstart', () => ensureAudioContext(), { once: true });
     document.addEventListener('click', () => ensureAudioContext(), { once: true });
