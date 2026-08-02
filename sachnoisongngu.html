@@ -156,7 +156,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        /* Quiz overlay */
         .quiz-overlay {
             display: none;
             position: fixed;
@@ -181,6 +180,13 @@
             position: relative;
             max-height: 90vh;
             overflow-y: auto;
+        }
+        .quiz-progress {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6b5b48;
+            margin-bottom: 15px;
         }
         .quiz-question {
             font-size: 1.8rem;
@@ -242,6 +248,10 @@
             background: #f7d1d1;
             color: #8f2a2a;
         }
+        .quiz-message.finish {
+            background: #f9f0b5;
+            color: #6b5a1a;
+        }
         .quiz-close {
             margin-top: 20px;
             text-align: center;
@@ -295,9 +305,10 @@
     <!-- Quiz Overlay -->
     <div class="quiz-overlay" id="quizOverlay">
         <div class="quiz-box">
+            <div class="quiz-progress" id="quizProgress">Câu 1 / 5</div>
             <div class="quiz-question" id="quizQuestion">❓ Tìm quả nào?</div>
             <div class="quiz-options" id="quizOptions"></div>
-            <div class="quiz-message" id="quizMessage">👆 Chọn một quả nhé!</div>
+            <div class="quiz-message" id="quizMessage">👆 Hãy chọn một quả!</div>
             <div class="quiz-close"><button id="quizCloseBtn">✖ Đóng</button></div>
         </div>
     </div>
@@ -350,7 +361,7 @@
             { vi: 'Quả gì to, vỏ xanh, ruột vàng, vị ngọt?', en: 'Which fruit is big, green skin, yellow flesh, sweet?', correctId: 14 },
             { vi: 'Quả gì có vỏ vàng, ruột trắng, vị chua?', en: 'Which fruit has yellow skin, white flesh, sour?', correctId: 16 },
             { vi: 'Quả gì có vỏ đỏ, ruột trắng, hạt đen?', en: 'Which fruit has red skin, white flesh, black seeds?', correctId: 1 },
-            { vi: 'Quả gì có vỏ xanh, ruột xanh, vị chua ngọt?', en: 'Which fruit has green skin, green flesh, sour-sweet?', correctId: 10 } // kiwi
+            { vi: 'Quả gì có vỏ xanh, ruột xanh, vị chua ngọt?', en: 'Which fruit has green skin, green flesh, sour-sweet?', correctId: 10 }
         ];
 
         // ============================================
@@ -369,8 +380,13 @@
         let currentSongIndex = -1;
         const audio = new Audio();
         let isPlaying = false;
-        let quizTarget = null;      // id của quả đúng
-        let quizAnswered = false;
+
+        // Quiz state
+        const TOTAL_QUESTIONS = 5;
+        let quizQuestionsList = [];          // danh sách 5 câu hỏi được chọn
+        let currentQuestionIdx = 0;          // chỉ số câu hiện tại (0..4)
+        let quizAnswered = false;            // đã trả lời đúng câu hiện tại chưa?
+        let quizCompleted = false;           // đã hoàn thành 5 câu?
 
         const grid = document.getElementById('fruitGrid');
         const langBtns = document.querySelectorAll('.lang-btn');
@@ -378,6 +394,7 @@
         const musicStatus = document.getElementById('musicStatus');
         const quizBtn = document.getElementById('quizBtn');
         const overlay = document.getElementById('quizOverlay');
+        const quizProgress = document.getElementById('quizProgress');
         const quizQuestion = document.getElementById('quizQuestion');
         const quizOptions = document.getElementById('quizOptions');
         const quizMessage = document.getElementById('quizMessage');
@@ -478,23 +495,51 @@
         }
 
         // ============================================
-        // 8. QUIZ - ĐỐ BÉ (đa dạng câu hỏi + đọc giọng)
+        // 8. QUIZ - ĐỐ BÉ (5 câu liên tiếp)
         // ============================================
         function startQuiz() {
-            // Chọn ngẫu nhiên 1 câu hỏi
-            const qIndex = Math.floor(Math.random() * quizQuestions.length);
-            const question = quizQuestions[qIndex];
-            const correctId = question.correctId;
-            const target = fruits.find(f => f.id === correctId);
-
-            quizTarget = correctId;
+            // Reset trạng thái
             quizAnswered = false;
+            quizCompleted = false;
+            currentQuestionIdx = 0;
 
-            // Hiển thị câu hỏi
-            const questionText = currentLang === 'vi' ? question.vi : question.en;
+            // Chọn ngẫu nhiên 5 câu hỏi (có thể trùng lặp)
+            quizQuestionsList = [];
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                const randomIdx = Math.floor(Math.random() * quizQuestions.length);
+                quizQuestionsList.push(quizQuestions[randomIdx]);
+            }
+
+            overlay.classList.add('show');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIdx >= TOTAL_QUESTIONS) {
+                // Đã hoàn thành 5 câu
+                quizCompleted = true;
+                quizProgress.textContent = '🎉 Hoàn thành!';
+                quizQuestion.textContent = currentLang === 'vi' ? '🌟 Bé đã trả lời đúng cả 5 câu! Giỏi quá!' : '🌟 You answered all 5 questions! Well done!';
+                quizOptions.innerHTML = '';
+                quizMessage.textContent = currentLang === 'vi' ? '👏 Chúc mừng bé!' : '👏 Congratulations!';
+                quizMessage.className = 'quiz-message finish';
+                // Đọc thông báo hoàn thành
+                speak(currentLang === 'vi' ? 'Bé đã trả lời đúng cả 5 câu, giỏi quá!' : 'You answered all 5 questions, well done!', currentLang);
+                return;
+            }
+
+            const q = quizQuestionsList[currentQuestionIdx];
+            const target = fruits.find(f => f.id === q.correctId);
+            if (!target) return;
+
+            quizAnswered = false;
+            const questionText = currentLang === 'vi' ? q.vi : q.en;
+            quizProgress.textContent = `Câu ${currentQuestionIdx + 1} / ${TOTAL_QUESTIONS}`;
             quizQuestion.textContent = `❓ ${questionText}`;
+            quizMessage.textContent = '👆 Hãy chọn một quả!';
+            quizMessage.className = 'quiz-message';
 
-            // Đọc câu hỏi bằng giọng
+            // Đọc câu hỏi
             speak(questionText, currentLang);
 
             // Tạo danh sách đáp án (xáo trộn)
@@ -509,45 +554,49 @@
                 btn.addEventListener('click', () => handleQuizChoice(f.id));
                 quizOptions.appendChild(btn);
             });
-
-            quizMessage.textContent = '👆 Hãy chọn một quả!';
-            quizMessage.className = 'quiz-message';
-            overlay.classList.add('show');
         }
 
         function handleQuizChoice(chosenId) {
-            if (quizAnswered) return;
-            const target = fruits.find(f => f.id === quizTarget);
+            // Nếu đã trả lời đúng câu này hoặc đã hoàn thành thì bỏ qua
+            if (quizAnswered || quizCompleted) return;
+
+            const q = quizQuestionsList[currentQuestionIdx];
+            if (!q) return;
+            const target = fruits.find(f => f.id === q.correctId);
             if (!target) return;
 
-            if (chosenId === quizTarget) {
+            if (chosenId === q.correctId) {
+                // Trả lời đúng
                 quizAnswered = true;
-                const msg = currentLang === 'vi' ? '🎉 Đúng rồi! Bé giỏi quá!' : '🎉 Correct! You\'re so smart!';
-                quizMessage.textContent = msg;
+                quizMessage.textContent = currentLang === 'vi' ? '✅ Đúng rồi! Bé giỏi!' : '✅ Correct! Well done!';
                 quizMessage.className = 'quiz-message correct';
-
-                // Đọc thông báo đúng + tên quả
+                // Đọc tên quả đúng + lời khen
                 speak(currentLang === 'vi' ? target.vi : target.en, currentLang);
                 setTimeout(() => {
-                    speak(currentLang === 'vi' ? 'Đúng rồi, bé giỏi quá!' : 'Correct, you\'re so smart!', currentLang);
+                    speak(currentLang === 'vi' ? 'Đúng rồi, giỏi quá!' : 'Correct, well done!', currentLang);
                 }, 800);
-            } else {
-                const msg = currentLang === 'vi' ? '❌ Sai rồi, chọn lại nhé!' : '❌ Wrong, try again!';
-                quizMessage.textContent = msg;
-                quizMessage.className = 'quiz-message wrong';
 
-                // Đọc thông báo sai
+                // Chuyển sang câu tiếp theo sau 1.5 giây
+                setTimeout(() => {
+                    currentQuestionIdx++;
+                    showQuestion();
+                }, 1800);
+            } else {
+                // Trả lời sai
+                quizMessage.textContent = currentLang === 'vi' ? '❌ Sai rồi, chọn lại nhé!' : '❌ Wrong, try again!';
+                quizMessage.className = 'quiz-message wrong';
                 speak(currentLang === 'vi' ? 'Sai rồi, chọn lại nhé!' : 'Wrong, try again!', currentLang);
+                // Không thay đổi câu hỏi, vẫn giữ nguyên đáp án
             }
         }
 
         function closeQuiz() {
             overlay.classList.remove('show');
+            // Reset trạng thái
+            quizQuestionsList = [];
+            currentQuestionIdx = 0;
             quizAnswered = false;
-            quizTarget = null;
-            quizMessage.textContent = '👆 Chọn một quả nhé!';
-            quizMessage.className = 'quiz-message';
-            // Dừng đọc nếu đang nói (tùy chọn)
+            quizCompleted = false;
             window.speechSynthesis.cancel();
         }
 
