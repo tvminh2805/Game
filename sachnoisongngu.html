@@ -5,45 +5,276 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📚 Sách nói trái cây</title>
     <style>
-        /* (Phần CSS giữ nguyên như cũ để tiết kiệm dung lượng) */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: linear-gradient(145deg, #fdf8ed 0%, #fef3d7 100%); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
-        .container { max-width: 800px; width: 100%; background: rgba(255, 248, 235, 0.85); backdrop-filter: blur(4px); border-radius: 48px 48px 32px 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); padding: 30px 25px 40px; border: 1px solid #fff3e0; }
-        h1 { text-align: center; font-size: 2.2rem; font-weight: 700; color: #4a3b2b; margin-bottom: 8px; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-        h1 small { font-size: 1.1rem; font-weight: 400; color: #7b6b58; }
-        .lang-bar { display: flex; justify-content: center; gap: 16px; margin: 18px 0 24px; }
-        .lang-btn { padding: 10px 32px; border: none; border-radius: 40px; font-size: 1.15rem; font-weight: 600; cursor: pointer; transition: all 0.25s; background: #e8ddd0; color: #5a4a3a; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .lang-btn.active { background: #4a7c6f; color: white; box-shadow: 0 6px 14px rgba(74, 124, 111, 0.35); transform: scale(1.03); }
-        .lang-btn:hover { transform: translateY(-2px); }
-        .fruit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 18px; margin: 25px 0 30px; }
-        .fruit-item { background: white; border-radius: 28px; padding: 16px 6px 14px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: all 0.2s ease; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .fruit-item:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.10); border-color: #c9b69c; }
-        .fruit-item:active { transform: scale(0.95); }
-        .fruit-emoji { font-size: 2.8rem; line-height: 1.2; }
-        .fruit-name { font-size: 1.05rem; font-weight: 600; color: #3d2e1e; word-break: break-word; }
-        .action-bar { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin: 10px 0 15px; }
-        .action-btn { background: white; border: none; border-radius: 60px; padding: 14px 28px; font-size: 1.5rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: all 0.2s; display: inline-flex; align-items: center; gap: 10px; color: #3d2e1e; border: 2px solid #e3d5c4; }
-        .action-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.10); border-color: #b8a48b; }
-        .action-btn:active { transform: scale(0.94); }
-        .music-indicator { font-size: 0.9rem; background: #ede3d6; padding: 6px 18px; border-radius: 40px; display: inline-block; margin-top: 6px; color: #4a3b2b; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .quiz-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 999; padding: 20px; }
-        .quiz-overlay.show { display: flex; }
-        .quiz-box { background: #fffcf5; border-radius: 56px; max-width: 700px; width: 100%; padding: 35px 30px 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto; }
-        .quiz-question { font-size: 1.8rem; font-weight: 700; color: #2d2419; text-align: center; margin-bottom: 25px; }
-        .quiz-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 14px; }
-        .quiz-option { background: white; border: 2px solid #dccfc0; border-radius: 40px; padding: 14px 6px; text-align: center; font-size: 1.2rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .quiz-option:hover { background: #f0e8dc; border-color: #b0987c; transform: scale(1.02); }
-        .quiz-option:active { transform: scale(0.95); }
-        .quiz-option .emoji { font-size: 2rem; }
-        .quiz-message { margin-top: 25px; font-size: 1.5rem; font-weight: 600; text-align: center; padding: 10px; border-radius: 40px; background: #f0ece6; min-height: 60px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .quiz-message.correct { background: #b3d9b2; color: #1f4f1f; }
-        .quiz-message.wrong { background: #f7d1d1; color: #8f2a2a; }
-        .quiz-close { margin-top: 20px; text-align: center; }
-        .quiz-close button { background: #4a7c6f; border: none; padding: 12px 40px; border-radius: 60px; color: white; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(74,124,111,0.3); }
-        .quiz-close button:hover { background: #3b665b; transform: scale(1.02); }
-        @media (max-width: 500px) { .fruit-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } .fruit-item { padding: 12px 4px; } .fruit-emoji { font-size: 2.2rem; } .fruit-name { font-size: 0.9rem; } .quiz-options { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 400px) { .fruit-grid { grid-template-columns: repeat(2, 1fr); } }
-        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #f0e8dc; border-radius: 10px; } ::-webkit-scrollbar-thumb { background: #c9b69c; border-radius: 10px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(145deg, #fdf8ed 0%, #fef3d7 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 248, 235, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.05);
+            padding: 30px 25px 40px;
+            border: 1px solid #fff3e0;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #4a3b2b;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        h1 small {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #7b6b58;
+        }
+        .lang-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 18px 0 24px;
+        }
+        .lang-btn {
+            padding: 10px 32px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: #e8ddd0;
+            color: #5a4a3a;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .lang-btn.active {
+            background: #4a7c6f;
+            color: white;
+            box-shadow: 0 6px 14px rgba(74, 124, 111, 0.35);
+            transform: scale(1.03);
+        }
+        .lang-btn:hover {
+            transform: translateY(-2px);
+        }
+        .fruit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 18px;
+            margin: 25px 0 30px;
+        }
+        .fruit-item {
+            background: white;
+            border-radius: 28px;
+            padding: 16px 6px 14px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .fruit-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.10);
+            border-color: #c9b69c;
+        }
+        .fruit-item:active {
+            transform: scale(0.95);
+        }
+        .fruit-emoji {
+            font-size: 2.8rem;
+            line-height: 1.2;
+        }
+        .fruit-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #3d2e1e;
+            word-break: break-word;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin: 10px 0 15px;
+        }
+        .action-btn {
+            background: white;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 28px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #3d2e1e;
+            border: 2px solid #e3d5c4;
+        }
+        .action-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.10);
+            border-color: #b8a48b;
+        }
+        .action-btn:active {
+            transform: scale(0.94);
+        }
+        .music-indicator {
+            font-size: 0.9rem;
+            background: #ede3d6;
+            padding: 6px 18px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 6px;
+            color: #4a3b2b;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* Quiz overlay */
+        .quiz-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 20px;
+        }
+        .quiz-overlay.show {
+            display: flex;
+        }
+        .quiz-box {
+            background: #fffcf5;
+            border-radius: 56px;
+            max-width: 700px;
+            width: 100%;
+            padding: 35px 30px 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .quiz-question {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d2419;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 14px;
+        }
+        .quiz-option {
+            background: white;
+            border: 2px solid #dccfc0;
+            border-radius: 40px;
+            padding: 14px 6px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .quiz-option:hover {
+            background: #f0e8dc;
+            border-color: #b0987c;
+            transform: scale(1.02);
+        }
+        .quiz-option:active {
+            transform: scale(0.95);
+        }
+        .quiz-option .emoji {
+            font-size: 2rem;
+        }
+        .quiz-message {
+            margin-top: 25px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            border-radius: 40px;
+            background: #f0ece6;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .quiz-message.correct {
+            background: #b3d9b2;
+            color: #1f4f1f;
+        }
+        .quiz-message.wrong {
+            background: #f7d1d1;
+            color: #8f2a2a;
+        }
+        .quiz-close {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .quiz-close button {
+            background: #4a7c6f;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 60px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(74,124,111,0.3);
+        }
+        .quiz-close button:hover {
+            background: #3b665b;
+            transform: scale(1.02);
+        }
+        @media (max-width: 500px) {
+            .fruit-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+            .fruit-item { padding: 12px 4px; }
+            .fruit-emoji { font-size: 2.2rem; }
+            .fruit-name { font-size: 0.9rem; }
+            .quiz-options { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 400px) {
+            .fruit-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0e8dc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #c9b69c; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -61,6 +292,7 @@
         <div id="musicStatus" class="music-indicator">🎶 Nhấn nút 🎵 để nghe nhạc</div>
     </div>
 
+    <!-- Quiz Overlay -->
     <div class="quiz-overlay" id="quizOverlay">
         <div class="quiz-box">
             <div class="quiz-question" id="quizQuestion">❓ Tìm quả nào?</div>
@@ -71,7 +303,9 @@
     </div>
 
     <script>
-        // ===== DỮ LIỆU TRÁI CÂY =====
+        // ============================================
+        // 1. DỮ LIỆU TRÁI CÂY (18 loại, khớp ảnh)
+        // ============================================
         const fruits = [
             { id: 1, vi: 'Quả lê', en: 'Pear', emoji: '🍐' },
             { id: 2, vi: 'Quả táo', en: 'Apple', emoji: '🍎' },
@@ -93,24 +327,51 @@
             { id: 18, vi: 'Quả dưa vàng', en: 'Hami Melon', emoji: '🍈' }
         ];
 
-        // ===== DANH SÁCH NHẠC (THAY LINK CỦA BẠN VÀO ĐÂY) =====
-        // ⚠️ LƯU Ý: Nếu dùng Google Drive, vẫn thay link vào nhưng nếu lỗi, nó sẽ tự động chuyển bài khác.
+        // ============================================
+        // 2. KHO CÂU HỎI ĐỐ (20 câu đa dạng)
+        // ============================================
+        const quizQuestions = [
+            { vi: 'Quả gì màu đỏ, vị ngọt?', en: 'Which fruit is red and sweet?', correctId: 2 },
+            { vi: 'Quả gì màu vàng, dài, vị ngọt?', en: 'Which fruit is yellow, long, and sweet?', correctId: 3 },
+            { vi: 'Quả gì có vỏ xanh, ruột đỏ, nhiều hạt đen?', en: 'Which fruit has green skin, red flesh, many black seeds?', correctId: 5 },
+            { vi: 'Quả gì có màu cam, vị chua ngọt?', en: 'Which fruit is orange, sour and sweet?', correctId: 8 },
+            { vi: 'Quả gì có vỏ nâu, lông xù, mùi thơm đặc biệt?', en: 'Which fruit has brown skin, hairy, special smell?', correctId: 15 },
+            { vi: 'Quả gì nhỏ, màu tím hoặc xanh, mọc thành chùm?', en: 'Which fruit is small, purple or green, grows in clusters?', correctId: 12 },
+            { vi: 'Quả gì có vỏ vàng, hình tròn, vị chua?', en: 'Which fruit has yellow skin, round, sour?', correctId: 16 },
+            { vi: 'Quả gì có hình ngôi sao khi cắt ngang?', en: 'Which fruit has a star shape when cut crosswise?', correctId: 6 },
+            { vi: 'Quả gì có vỏ xanh, ruột vàng, vị chua ngọt?', en: 'Which fruit has green skin, yellow flesh, sour-sweet?', correctId: 14 },
+            { vi: 'Quả gì có vỏ đỏ, hạt nhỏ li ti bên ngoài?', en: 'Which fruit has red skin, tiny seeds outside?', correctId: 4 },
+            { vi: 'Quả gì có vỏ xanh, ruột trắng, vị ngọt thanh?', en: 'Which fruit has green skin, white flesh, sweet taste?', correctId: 17 },
+            { vi: 'Quả gì có vỏ vàng, ruột vàng, vị ngọt thơm?', en: 'Which fruit has yellow skin, yellow flesh, sweet and fragrant?', correctId: 11 },
+            { vi: 'Quả gì có vỏ tím, ruột trắng, vị ngọt?', en: 'Which fruit has purple skin, white flesh, sweet?', correctId: 7 },
+            { vi: 'Quả gì có vỏ nâu, ruột trắng, vị béo?', en: 'Which fruit has brown skin, white flesh, creamy?', correctId: 9 },
+            { vi: 'Quả gì có vỏ xanh, ruột đỏ, vị ngọt mát?', en: 'Which fruit has green skin, red flesh, sweet and refreshing?', correctId: 5 },
+            { vi: 'Quả gì có vỏ xanh, ruột cam, vị chua ngọt?', en: 'Which fruit has green skin, orange flesh, sour-sweet?', correctId: 8 },
+            { vi: 'Quả gì to, vỏ xanh, ruột vàng, vị ngọt?', en: 'Which fruit is big, green skin, yellow flesh, sweet?', correctId: 14 },
+            { vi: 'Quả gì có vỏ vàng, ruột trắng, vị chua?', en: 'Which fruit has yellow skin, white flesh, sour?', correctId: 16 },
+            { vi: 'Quả gì có vỏ đỏ, ruột trắng, hạt đen?', en: 'Which fruit has red skin, white flesh, black seeds?', correctId: 1 },
+            { vi: 'Quả gì có vỏ xanh, ruột xanh, vị chua ngọt?', en: 'Which fruit has green skin, green flesh, sour-sweet?', correctId: 10 } // kiwi
+        ];
+
+        // ============================================
+        // 3. DANH SÁCH 10 BÀI HÁT THIẾU NHI (Internet Archive)
+        // ============================================
         const songs = [
             { name: 'Bống bống bang bang', url: 'https://raw.githubusercontent.com/tvminh2805/Music/main/bongbongbangbang.mp3 ' },
             { name: 'Chú ếch con', url: 'https://raw.githubusercontent.com/tvminh2805/Music/main/chuechcon.mp3 ' },
             { name: 'Cháu yêu bà', url: 'https://raw.githubusercontent.com/tvminh2805/Music/main/chauyeuba.mp3 ' }
-
         ];
 
-        // ===== TRẠNG THÁI =====
+        // ============================================
+        // 4. TRẠNG THÁI & DOM
+        // ============================================
         let currentLang = 'vi';
         let currentSongIndex = -1;
         const audio = new Audio();
         let isPlaying = false;
-        let quizTarget = null;
+        let quizTarget = null;      // id của quả đúng
         let quizAnswered = false;
 
-        // ===== DOM =====
         const grid = document.getElementById('fruitGrid');
         const langBtns = document.querySelectorAll('.lang-btn');
         const musicBtn = document.getElementById('musicBtn');
@@ -122,9 +383,11 @@
         const quizMessage = document.getElementById('quizMessage');
         const quizCloseBtn = document.getElementById('quizCloseBtn');
 
-        // ===== HÀM ĐỌC =====
+        // ============================================
+        // 5. HÀM ĐỌC GIỌNG NÓI (TTS)
+        // ============================================
         function speak(text, lang) {
-            if (!window.speechSynthesis) return alert('Trình duyệt không hỗ trợ đọc giọng nói.');
+            if (!window.speechSynthesis) return;
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang === 'vi' ? 'vi-VN' : 'en-US';
@@ -133,14 +396,19 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // ===== RENDER TRÁI CÂY =====
+        // ============================================
+        // 6. HIỂN THỊ DANH SÁCH TRÁI CÂY
+        // ============================================
         function renderFruits() {
             grid.innerHTML = '';
             fruits.forEach(f => {
                 const name = currentLang === 'vi' ? f.vi : f.en;
                 const div = document.createElement('div');
                 div.className = 'fruit-item';
-                div.innerHTML = `<div class="fruit-emoji">${f.emoji}</div><div class="fruit-name">${name}</div>`;
+                div.innerHTML = `
+                    <div class="fruit-emoji">${f.emoji}</div>
+                    <div class="fruit-name">${name}</div>
+                `;
                 div.addEventListener('click', () => speak(name, currentLang));
                 grid.appendChild(div);
             });
@@ -152,19 +420,19 @@
             renderFruits();
         }
 
-        // ===== XỬ LÝ NHẠC (CÓ TỰ ĐỘNG BỎ QUA BÀI LỖI) =====
+        // ============================================
+        // 7. XỬ LÝ NHẠC (tự động chuyển bài khi lỗi)
+        // ============================================
         function playNextSong() {
             if (songs.length === 0) {
                 musicStatus.textContent = '⚠️ Không có bài hát nào.';
                 return;
             }
-
             let newIdx;
             let attempts = 0;
             do {
                 newIdx = Math.floor(Math.random() * songs.length);
                 attempts++;
-                // Nếu chỉ có 1 bài hoặc đã thử hết số bài, thoát vòng lặp
             } while (newIdx === currentSongIndex && songs.length > 1 && attempts < songs.length);
 
             currentSongIndex = newIdx;
@@ -172,30 +440,20 @@
             audio.src = song.url;
             audio.load();
 
-            // Xóa sự kiện cũ để tránh trùng lặp
-            audio.onerror = null;
-            audio.onended = null;
-
-            // Khi lỗi không tải được (CORS/404), tự động chuyển bài tiếp theo
             audio.onerror = function(e) {
                 console.warn('Lỗi tải bài:', song.name, e);
                 isPlaying = false;
                 musicStatus.textContent = `❌ Không tải được "${song.name}", chuyển bài khác...`;
-                // Gọi lại hàm để tìm bài khác (tránh lặp vô hạn bằng cờ)
-                setTimeout(() => {
-                    if (!isPlaying) playNextSong();
-                }, 1500);
+                setTimeout(() => { if (!isPlaying) playNextSong(); }, 1500);
             };
 
             audio.play().then(() => {
                 isPlaying = true;
                 musicStatus.textContent = `🎵 Đang phát: ${song.name}`;
             }).catch(err => {
-                // Nếu play thất bại, kích hoạt lỗi để chuyển bài
                 audio.onerror(err);
             });
 
-            // Khi bài hát kết thúc, sang bài mới
             audio.onended = function() {
                 isPlaying = false;
                 musicStatus.textContent = '⏹ Kết thúc, chuyển bài...';
@@ -219,15 +477,27 @@
             }
         }
 
-        // ===== QUIZ =====
+        // ============================================
+        // 8. QUIZ - ĐỐ BÉ (đa dạng câu hỏi + đọc giọng)
+        // ============================================
         function startQuiz() {
-            const target = fruits[Math.floor(Math.random() * fruits.length)];
-            quizTarget = target.id;
+            // Chọn ngẫu nhiên 1 câu hỏi
+            const qIndex = Math.floor(Math.random() * quizQuestions.length);
+            const question = quizQuestions[qIndex];
+            const correctId = question.correctId;
+            const target = fruits.find(f => f.id === correctId);
+
+            quizTarget = correctId;
             quizAnswered = false;
-            const targetName = currentLang === 'vi' ? target.vi : target.en;
-            quizQuestion.textContent = currentLang === 'vi' ? `🔍 Tìm quả: “${targetName}” là quả nào?` : `🔍 Find: “${targetName}” — which one?`;
-            quizMessage.textContent = '👆 Hãy chọn một quả!';
-            quizMessage.className = 'quiz-message';
+
+            // Hiển thị câu hỏi
+            const questionText = currentLang === 'vi' ? question.vi : question.en;
+            quizQuestion.textContent = `❓ ${questionText}`;
+
+            // Đọc câu hỏi bằng giọng
+            speak(questionText, currentLang);
+
+            // Tạo danh sách đáp án (xáo trộn)
             const shuffled = [...fruits].sort(() => Math.random() - 0.5);
             quizOptions.innerHTML = '';
             shuffled.forEach(f => {
@@ -239,6 +509,9 @@
                 btn.addEventListener('click', () => handleQuizChoice(f.id));
                 quizOptions.appendChild(btn);
             });
+
+            quizMessage.textContent = '👆 Hãy chọn một quả!';
+            quizMessage.className = 'quiz-message';
             overlay.classList.add('show');
         }
 
@@ -246,14 +519,25 @@
             if (quizAnswered) return;
             const target = fruits.find(f => f.id === quizTarget);
             if (!target) return;
+
             if (chosenId === quizTarget) {
                 quizAnswered = true;
-                quizMessage.textContent = currentLang === 'vi' ? '🎉 Đúng rồi! Bé giỏi quá!' : '🎉 Correct! You\'re so smart!';
+                const msg = currentLang === 'vi' ? '🎉 Đúng rồi! Bé giỏi quá!' : '🎉 Correct! You\'re so smart!';
+                quizMessage.textContent = msg;
                 quizMessage.className = 'quiz-message correct';
+
+                // Đọc thông báo đúng + tên quả
                 speak(currentLang === 'vi' ? target.vi : target.en, currentLang);
+                setTimeout(() => {
+                    speak(currentLang === 'vi' ? 'Đúng rồi, bé giỏi quá!' : 'Correct, you\'re so smart!', currentLang);
+                }, 800);
             } else {
-                quizMessage.textContent = currentLang === 'vi' ? '❌ Sai rồi, chọn lại nhé!' : '❌ Wrong, try again!';
+                const msg = currentLang === 'vi' ? '❌ Sai rồi, chọn lại nhé!' : '❌ Wrong, try again!';
+                quizMessage.textContent = msg;
                 quizMessage.className = 'quiz-message wrong';
+
+                // Đọc thông báo sai
+                speak(currentLang === 'vi' ? 'Sai rồi, chọn lại nhé!' : 'Wrong, try again!', currentLang);
             }
         }
 
@@ -263,18 +547,37 @@
             quizTarget = null;
             quizMessage.textContent = '👆 Chọn một quả nhé!';
             quizMessage.className = 'quiz-message';
+            // Dừng đọc nếu đang nói (tùy chọn)
+            window.speechSynthesis.cancel();
         }
 
-        // ===== KHỞI TẠO =====
+        // ============================================
+        // 9. KHỞI TẠO
+        // ============================================
         function init() {
             setLang('vi');
-            langBtns.forEach(btn => btn.addEventListener('click', () => setLang(btn.dataset.lang)));
+
+            langBtns.forEach(btn => {
+                btn.addEventListener('click', () => setLang(btn.dataset.lang));
+            });
+
             musicBtn.addEventListener('click', toggleMusic);
             quizBtn.addEventListener('click', startQuiz);
             quizCloseBtn.addEventListener('click', closeQuiz);
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeQuiz(); });
-            window.addEventListener('beforeunload', () => { audio.pause(); audio.src = ''; window.speechSynthesis.cancel(); });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeQuiz();
+            });
+
+            window.addEventListener('beforeunload', () => {
+                audio.pause();
+                audio.src = '';
+                window.speechSynthesis.cancel();
+            });
+
+            musicStatus.textContent = '🎶 Nhấn nút 🎵 để nghe nhạc';
         }
+
         init();
     </script>
 </body>
