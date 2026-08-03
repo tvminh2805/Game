@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🔍 Tìm bóng của ảnh</title>
+    <title>🔍 Tìm bóng - Vuốt tự do</title>
     <style>
         * {
             box-sizing: border-box;
@@ -46,6 +46,7 @@
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
+            position: relative;
         }
         h1 {
             text-align: center;
@@ -148,10 +149,9 @@
             gap: 1px;
             pointer-events: none;
         }
-        /* ===== ẢNH TO HƠN, SÁT KHUNG ===== */
         .card-image {
-            width: 92% !important;  /* tăng từ 78% lên 92% */
-            height: 88% !important; /* tăng từ 72% lên 88% */
+            width: 92% !important;
+            height: 88% !important;
             object-fit: contain;
             display: block;
             pointer-events: none;
@@ -165,7 +165,6 @@
             pointer-events: none;
             margin-top: 1px;
         }
-        /* ===== BÓNG ĐEN TỪ ẢNH ===== */
         .shadow-card .card-image {
             filter: brightness(0) contrast(1.2) !important;
             opacity: 1;
@@ -173,7 +172,6 @@
         .shadow-card .animal-name {
             display: none;
         }
-        /* ===== CÁC TRẠNG THÁI ===== */
         .card-item.selected {
             box-shadow: 0 0 0 4px #ffb74d, 0 3px 0 #b8957a;
             transform: scale(1.03);
@@ -324,7 +322,6 @@
             line-height: 1;
             pointer-events: none;
         }
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 450px) {
             .app-container { padding: 6px 6px 8px; max-height: 96vh; border-radius: 24px; }
             .card-item { max-width: 85px; border-radius: 14px 8px 14px 8px; border-width: 2px; box-shadow: 0 2px 0 #b8957a, 0 4px 8px rgba(0,0,0,0.08); padding: 2px; }
@@ -359,13 +356,13 @@
     </style>
 </head>
 <body>
-<div class="app-container">
+<div class="app-container" id="appContainer">
     <h1>
         🧩 TÌM BÓNG CỦA ẢNH
-    
+        <small>vuốt tự do</small>
     </h1>
     <div class="instruction-wrap">
-        <div class="instruction">👆 Kéo ảnh thả vào bóng của nó</div>
+        <div class="instruction">👆 Kéo ảnh → thả bóng | Vuốt ↔ để chuyển trang</div>
     </div>
 
     <div class="game-grid">
@@ -381,7 +378,7 @@
 
     <div class="connector-status">
         <span class="status-badge" id="pairsStatus">0 / 4 cặp</span>
-        <span class="status-badge" id="feedbackMessage">💡 Kéo ảnh vào bóng </span>
+        <span class="status-badge" id="feedbackMessage">💡 kéo hoặc bấm chọn</span>
         <span class="page-indicator" id="pageIndicator">Trang 1 / 4</span>
     </div>
 
@@ -564,6 +561,7 @@
     let selectedImageId = null;
 
     // DOM refs
+    const container = document.getElementById('appContainer');
     const imageColumn = document.getElementById('imageColumn');
     const shadowColumn = document.getElementById('shadowColumn');
     const pairsStatus = document.getElementById('pairsStatus');
@@ -590,7 +588,6 @@
         imageColumn.innerHTML = '';
         shadowColumn.innerHTML = '';
 
-        // Cột ảnh
         currentPairs.forEach((pair, index) => {
             const card = document.createElement('div');
             card.className = 'card-item';
@@ -611,7 +608,6 @@
             imageColumn.appendChild(card);
         });
 
-        // Cột bóng
         currentShuffledIndices.forEach((origIdx) => {
             const pair = currentPairs[origIdx];
             const card = document.createElement('div');
@@ -632,7 +628,6 @@
             shadowColumn.appendChild(card);
         });
 
-        // Highlight
         if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
             const imageCards = imageColumn.querySelectorAll('.card-item');
             imageCards.forEach(card => {
@@ -649,26 +644,20 @@
         if (isComplete) {
             feedbackMsg.textContent = '🎉 Hoàn thành trang!';
             winToast.classList.add('show');
-            nextBtn.disabled = (currentPage >= totalPages - 1);
-            if (currentPage === totalPages - 1) {
-                nextBtn.textContent = '🏁 Kết thúc';
-                nextBtn.disabled = true;
-            } else {
-                nextBtn.textContent = 'Tiếp ▶';
-                nextBtn.disabled = false;
-            }
+            // Không disable nút next vì đã cho chuyển tự do
         } else {
             winToast.classList.remove('show');
-            nextBtn.disabled = true;
             if (selectedImageId !== null && !matchedPairs[selectedImageId]) {
                 feedbackMsg.textContent = `🔍 Đang chọn: ${currentPairs[selectedImageId].name}`;
             } else {
-                feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng';
+                feedbackMsg.textContent = '💡 Kéo hoặc bấm chọn ảnh → bấm bóng';
             }
         }
+        // Nút trước/sau không bị disable do không cần hoàn thành
+        prevBtn.disabled = (currentPage === 0);
+        nextBtn.disabled = (currentPage === totalPages - 1);
 
         pageIndicator.textContent = `Trang ${currentPage+1} / ${totalPages}`;
-        prevBtn.disabled = (currentPage === 0);
     }
 
     // === CHẾ ĐỘ CLICK ===
@@ -707,7 +696,7 @@
             return;
         }
         if (selectedImageId === null) {
-            feedbackMsg.textContent = '👆 Chọn ảnh trước ';
+            feedbackMsg.textContent = '👆 Chọn ảnh trước (bấm vào ảnh)';
             return;
         }
         if (matchedPairs[selectedImageId]) {
@@ -884,14 +873,9 @@
         dragData.clone.style.top = cy + 'px';
     }
 
-    // === CHUYỂN TRANG ===
+    // === CHUYỂN TRANG TỰ DO (không cần hoàn thành) ===
     function goToPage(page) {
         if (page < 0 || page >= totalPages) return;
-        const matchedCount = matchedPairs.filter(v => v).length;
-        if (page > currentPage && matchedCount < currentPairs.length) {
-            feedbackMsg.textContent = '⚠️ Hãy nối hết các cặp trước khi sang trang mới!';
-            return;
-        }
         currentPage = page;
         currentPairs = PAGES[currentPage];
         matchedPairs = new Array(currentPairs.length).fill(false);
@@ -918,6 +902,71 @@
     });
     resetBtn.addEventListener('click', resetGame);
 
+    // === VUỐT ===
+    let swipeStartX = null;
+    let swipeStartY = null;
+    let swipeStartTime = null;
+    let isSwiping = false;
+
+    function handleTouchStart(e) {
+        if (dragData) return;
+        const touch = e.touches[0];
+        swipeStartX = touch.clientX;
+        swipeStartY = touch.clientY;
+        swipeStartTime = Date.now();
+        isSwiping = false;
+    }
+
+    function handleTouchMove(e) {
+        if (dragData) return;
+        if (swipeStartX === null) return;
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - swipeStartX;
+        const deltaY = touch.clientY - swipeStartY;
+        if (Math.abs(deltaX) > 30 && Math.abs(deltaY) < 50) {
+            isSwiping = true;
+            e.preventDefault();
+        }
+    }
+
+    function handleTouchEnd(e) {
+        if (dragData) return;
+        if (swipeStartX === null) return;
+        if (!isSwiping) {
+            swipeStartX = null;
+            return;
+        }
+        const touch = e.changedTouches[0];
+        const deltaX = touch.clientX - swipeStartX;
+        const deltaY = touch.clientY - swipeStartY;
+        const elapsed = Date.now() - swipeStartTime;
+
+        if (elapsed < 400 && Math.abs(deltaX) > 50 && Math.abs(deltaY) < 60) {
+            if (deltaX < 0) {
+                if (currentPage < totalPages - 1) {
+                    goToPage(currentPage + 1);
+                } else {
+                    feedbackMsg.textContent = '🏁 Đã ở trang cuối cùng';
+                    setTimeout(() => feedbackMsg.textContent = '💡 Kéo hoặc bấm chọn ảnh', 1000);
+                }
+            } else {
+                if (currentPage > 0) {
+                    goToPage(currentPage - 1);
+                } else {
+                    feedbackMsg.textContent = '🏁 Đã ở trang đầu tiên';
+                    setTimeout(() => feedbackMsg.textContent = '💡 Kéo hoặc bấm chọn ảnh', 1000);
+                }
+            }
+        }
+        swipeStartX = null;
+        swipeStartY = null;
+        isSwiping = false;
+    }
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false });
+
     // === KHỞI TẠO ===
     if ('speechSynthesis' in window) {
         window.speechSynthesis.getVoices();
@@ -928,7 +977,7 @@
 
     initDragDrop();
     render();
-    feedbackMsg.textContent = '💡 Kéo ảnh vào bóng';
+    feedbackMsg.textContent = '💡 Kéo ảnh thả vào bóng (vuốt để chuyển trang)';
 
     document.addEventListener('touchstart', () => ensureAudioContext(), { once: true });
     document.addEventListener('click', () => ensureAudioContext(), { once: true });
